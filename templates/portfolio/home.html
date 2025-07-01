@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Portfolio{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1>Welcome to My Portfolio</h1>
+            <p class="lead">This is the home page of my portfolio website.</p>
+            
+            {% if personal_info %}
+                <h2>{{ personal_info.full_name }}</h2>
+                <p>{{ personal_info.title }}</p>
+                <p>{{ personal_info.bio }}</p>
+            {% endif %}
+            
+            {% if featured_projects %}
+                <h3>Featured Projects</h3>
+                <div class="row">
+                    {% for project in featured_projects %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ project.title }}</h5>
+                                    <p class="card-text">{{ project.description|truncatewords:20 }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
