@@ -7,30 +7,24 @@ from django.core.mail import send_mail
 from django.conf import settings
 
 from .models import (
-    PersonalInfo, Skill, Project, Testimonial, 
-    Experience, Education, BlogPost, ContactMessage
+    Tag, Project, Testimonial, 
+    BlogPost, ContactMessage
 )
 from .forms import ContactForm
 
 
 class HomeView(TemplateView):
-    """Home page view with personal info, featured projects, and skills"""
+    """Home page view with featured projects and testimonials"""
     template_name = 'portfolio/home.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Get personal information
-        context['personal_info'] = PersonalInfo.objects.first()
-        
         # Get featured projects (limit to 3)
         context['featured_projects'] = Project.objects.filter(is_featured=True)[:3]
         
-        # Get featured skills grouped by category
-        context['featured_skills'] = Skill.objects.filter(is_featured=True).order_by('category', '-proficiency')
-        
         # Get testimonials
-        context['testimonials'] = Testimonial.objects.filter(is_featured=True)[:3]
+        context['testimonials'] = Testimonial.objects.all()[:3]
         
         # Get latest blog posts if any
         context['latest_blog_posts'] = BlogPost.objects.filter(is_published=True)[:3]
@@ -39,29 +33,11 @@ class HomeView(TemplateView):
 
 
 class AboutView(TemplateView):
-    """About page with detailed personal info, experience, education, and skills"""
+    """About page with testimonials"""
     template_name = 'portfolio/about.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        # Get personal information
-        context['personal_info'] = PersonalInfo.objects.first()
-        
-        # Get work experience
-        context['experiences'] = Experience.objects.all()
-        
-        # Get education
-        context['education'] = Education.objects.all()
-        
-        # Get all skills grouped by category
-        skills_by_category = {}
-        for skill in Skill.objects.all():
-            category = skill.get_category_display()
-            if category not in skills_by_category:
-                skills_by_category[category] = []
-            skills_by_category[category].append(skill)
-        context['skills_by_category'] = skills_by_category
         
         # Get all testimonials
         context['testimonials'] = Testimonial.objects.all()
@@ -85,36 +61,26 @@ class ProjectsListView(ListView):
             queryset = queryset.filter(
                 Q(title__icontains=search_query) |
                 Q(description__icontains=search_query) |
-                Q(technologies__name__icontains=search_query)
+                Q(tech_stack__icontains=search_query) |
+                Q(tags__name__icontains=search_query)
             ).distinct()
         
-        # Filter by technology
-        technology = self.request.GET.get('technology')
-        if technology:
-            queryset = queryset.filter(technologies__name__iexact=technology)
-        
-        # Filter by status
-        status = self.request.GET.get('status')
-        if status:
-            queryset = queryset.filter(status=status)
+        # Filter by tag
+        tag = self.request.GET.get('tag')
+        if tag:
+            queryset = queryset.filter(tags__name__iexact=tag)
             
         return queryset
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Get all technologies for filtering
-        context['technologies'] = Skill.objects.filter(
-            project__isnull=False
-        ).distinct().order_by('name')
-        
-        # Get project statuses for filtering
-        context['statuses'] = Project.PROJECT_STATUS
+        # Get all tags for filtering
+        context['tags'] = Tag.objects.all().order_by('name')
         
         # Pass current filters
         context['current_search'] = self.request.GET.get('search', '')
-        context['current_technology'] = self.request.GET.get('technology', '')
-        context['current_status'] = self.request.GET.get('status', '')
+        context['current_tag'] = self.request.GET.get('tag', '')
         
         return context
 
@@ -130,10 +96,10 @@ class ProjectDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Get related projects (same technologies or featured)
+        # Get related projects (same tags or featured)
         current_project = self.object
         related_projects = Project.objects.filter(
-            Q(technologies__in=current_project.technologies.all()) |
+            Q(tags__in=current_project.tags.all()) |
             Q(is_featured=True)
         ).exclude(id=current_project.id).distinct()[:3]
         
@@ -157,9 +123,8 @@ class BlogListView(ListView):
         if search_query:
             queryset = queryset.filter(
                 Q(title__icontains=search_query) |
-                Q(content__icontains=search_query) |
-                Q(excerpt__icontains=search_query) |
-                Q(tags__icontains=search_query)
+                Q(body__icontains=search_query) |
+                Q(excerpt__icontains=search_query)
             )
         
         # Filter by tag
@@ -239,9 +204,6 @@ class ContactView(FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Get personal information for contact details
-        context['personal_info'] = PersonalInfo.objects.first()
-        
         return context
     
     def form_valid(self, form):
@@ -276,7 +238,7 @@ New Contact Form Submission
 From: {contact_message.name}
 Email: {contact_message.email}
 Subject: {contact_message.subject}
-Submitted: {contact_message.created_at.strftime('%Y-%m-%d %H:%M:%S')}
+Submitted: {contact_message.created.strftime('%Y-%m-%d %H:%M:%S')}
 
 Message:
 {'-' * 40}
