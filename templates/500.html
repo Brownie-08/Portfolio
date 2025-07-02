@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Server Error - My Portfolio{% endblock %}
+{% block description %}An internal server error occurred. Please try again later.{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                <div class="error-content">
+                    <div class="mb-4">
+                        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 8rem;"></i>
+                    </div>
+                    <h1 class="display-1 fw-bold text-danger mb-3">500</h1>
+                    <h2 class="h3 fw-bold mb-3">Internal Server Error</h2>
+                    <p class="lead text-muted mb-4">
+                        Something went wrong on our end. We're working to fix this issue. 
+                        Please try again in a few moments.
+                    </p>
+                    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                        <a href="{% url 'portfolio:home' %}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-house me-2"></i>Go Home
+                        </a>
+                        <button onclick="window.location.reload()" class="btn btn-outline-primary btn-lg">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Try Again
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h3 class="fw-bold mb-3">Still Having Issues?</h3>
+                <p class="text-muted mb-4">
+                    If this problem persists, please don't hesitate to reach out. 
+                    I'd be happy to help resolve any technical difficulties.
+                </p>
+                <a href="{% url 'portfolio:contact' %}" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-envelope me-2"></i>Contact Support
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Projects - My Portfolio{% endblock %}
+{% block description %}Explore my portfolio projects showcasing diverse skills and innovative solutions.{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="bg-primary text-white py-5 mb-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold">My Projects</h1>
+                <p class="lead">Showcasing a collection of projects that demonstrate my skills and expertise in various technologies.</p>
+            </div>
+            <div class="col-lg-4 text-center">
+                <i class="bi bi-collection display-1 opacity-75"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Projects -->
+{% if featured_projects %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2 class="display-5 fw-bold">Featured Projects</h2>
+                <p class="lead text-muted">Highlighting my best work and most innovative solutions</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            {% for project in featured_projects %}
+                <div class="col-lg-6">
+                    <div class="card h-100 border-0 shadow-lg hover-lift">
+                        <div class="row g-0">
+                            <div class="col-md-6">
+                                {% if project.image %}
+                                    <img src="{{ project.image.url }}" class="img-fluid h-100 rounded-start" 
+                                         alt="{{ project.title }}" style="object-fit: cover; min-height: 250px;">
+                                {% else %}
+                                    <div class="bg-primary h-100 d-flex align-items-center justify-content-center rounded-start" 
+                                         style="min-height: 250px;">
+                                        <i class="bi bi-image text-white fs-1"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card-body p-4 h-100 d-flex flex-column">
+                                    <div class="mb-2">
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="bi bi-star-fill me-1"></i>Featured
+                                        </span>
+                                    </div>
+                                    <h5 class="card-title fw-bold">{{ project.title }}</h5>
+                                    <p class="card-text flex-grow-1">{{ project.description|truncatewords:25 }}</p>
+                                    <div class="mt-auto">
+                                        <div class="d-flex flex-wrap gap-1 mb-3">
+                                            {% for tech in project.tech_stack.split:','|slice:':3' %}
+                                                <span class="badge bg-secondary">{{ tech|trim }}</span>
+                                            {% endfor %}
+                                        </div>
+                                        <a href="{{ project.get_absolute_url }}" class="btn btn-primary">
+                                            <i class="bi bi-arrow-right me-1"></i>View Details
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- All Projects -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2 class="display-5 fw-bold">All Projects</h2>
+                <p class="lead text-muted">A comprehensive view of my development journey</p>
+            </div>
+        </div>
+        
+        {% if projects %}
+            <div class="row g-4">
+                {% for project in projects %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card h-100 border-0 shadow-sm hover-lift">
+                            {% if project.image %}
+                                <img src="{{ project.image.url }}" class="card-img-top" alt="{{ project.title }}" 
+                                     style="height: 200px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-secondary card-img-top d-flex align-items-center justify-content-center" 
+                                     style="height: 200px;">
+                                    <i class="bi bi-image text-white fs-1"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="card-body d-flex flex-column">
+                                <div class="mb-2">
+                                    {% if project.is_featured %}
+                                        <span class="badge bg-warning text-dark me-2">
+                                            <i class="bi bi-star-fill me-1"></i>Featured
+                                        </span>
+                                    {% endif %}
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar me-1"></i>{{ project.created_at|date:"M Y" }}
+                                    </small>
+                                </div>
+                                
+                                <h5 class="card-title fw-bold">{{ project.title }}</h5>
+                                <p class="card-text flex-grow-1">{{ project.description|truncatewords:20 }}</p>
+                                
+                                <div class="mt-auto">
+                                    <div class="d-flex flex-wrap gap-1 mb-3">
+                                        {% for tech in project.tech_stack.split:','|slice:':3' %}
+                                            <span class="badge bg-light text-dark">{{ tech|trim }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ project.get_absolute_url }}" class="btn btn-primary btn-sm flex-grow-1">
+                                            <i class="bi bi-arrow-right me-1"></i>Details
+                                        </a>
+                                        {% if project.live_url %}
+                                            <a href="{{ project.live_url }}" target="_blank" rel="noopener" 
+                                               class="btn btn-outline-success btn-sm">
+                                                <i class="bi bi-box-arrow-up-right"></i>
+                                            </a>
+                                        {% endif %}
+                                        {% if project.repo_url %}
+                                            <a href="{{ project.repo_url }}" target="_blank" rel="noopener" 
+                                               class="btn btn-outline-dark btn-sm">
+                                                <i class="bi bi-github"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination if needed -->
+            {% if is_paginated %}
+                <nav aria-label="Projects pagination" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1" aria-label="First">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active" aria-current="page">
+                            <span class="page-link">{{ page_obj.number }}</span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="row justify-content-center">
+                <div class="col-lg-6 text-center">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-5">
+                            <i class="bi bi-folder-x text-muted mb-3" style="font-size: 3rem;"></i>
+                            <h3 class="fw-bold mb-3">No Projects Yet</h3>
+                            <p class="text-muted mb-0">I'm currently working on some exciting projects. Check back soon!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="bg-dark text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="fw-bold mb-2">Interested in Working Together?</h3>
+                <p class="lead mb-0">I'm always excited to take on new challenges and create amazing projects.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'portfolio:contact' %}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-chat-dots me-2"></i>Start a Project
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block extra_css %}
+<style>
+    .hover-lift {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+</style>
+{% endblock %}
+{% endblock %}

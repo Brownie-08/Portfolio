@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ post.title }} - My Blog{% endblock %}
+{% block description %}{{ post.excerpt|default:post.body|truncatewords:30 }}{% endblock %}
+
+{% block content %}
+<!-- Blog Post Header -->
+<section class="bg-primary text-white py-5 mb-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb text-white-50">
+                        <li class="breadcrumb-item"><a href="{% url 'portfolio:home' %}" class="text-white-50">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'portfolio:blog_list' %}" class="text-white-50">Blog</a></li>
+                        <li class="breadcrumb-item active text-white" aria-current="page">{{ post.title }}</li>
+                    </ol>
+                </nav>
+                <h1 class="display-4 fw-bold mb-3">{{ post.title }}</h1>
+                <p class="lead mb-4">{{ post.excerpt|default:post.body|truncatewords:50 }}</p>
+                
+                <div class="d-flex align-items-center">
+                    <small class="me-3">
+                        <i class="bi bi-calendar me-1"></i>{{ post.created|date:"M d, Y" }}
+                    </small>
+                    <div>
+                        {% for tag in post.tags.split:',' %}
+                            <span class="badge bg-info text-dark me-1">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" alt="{{ post.title }}" class="img-fluid rounded" style="max-height: 300px;">
+                {% else %}
+                    <div class="bg-white p-3 rounded-circle d-flex align-items-center justify-content-center" 
+                         style="width: 150px; height: 150px;">
+                        <i class="bi bi-journal-text display-3 text-primary"></i>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Blog Post Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <article class="content">
+                    {{ post.body|linebreaksbr }}
+                </article>
+            </div>
+            <div class="col-lg-4">
+                <!-- About Author -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h4 class="fw-bold">About the Author</h4>
+                        <p class="text-muted">Sharing knowledge and insights from my development journey.
+                           Passionate about technology and coding best practices. Always eager to learn and grow.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Latest Posts -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h4 class="fw-bold">Latest Posts</h4>
+                        {% for latest in latest_posts %}
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="flex-shrink-0 me-3">
+                                    {% if latest.image %}
+                                        <img src="{{ latest.image.url }}" alt="{{ latest.title }}" class="rounded" 
+                                             style="width: 60px; height: 60px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="bg-secondary rounded d-flex align-items-center justify-content-center" 
+                                             style="width: 60px; height: 60px;">
+                                            <i class="bi bi-journal-text text-white"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-0"><a href="{{ latest.get_absolute_url }}" class="text-dark">{{ latest.title }}</a></h6>
+                                    <small class="text-muted">{{ latest.created|date:"M d, Y" }}</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="bg-dark text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="fw-bold mb-2">Like What You Read?</h3>
+                <p class="lead mb-0">Stay updated with more exciting content and insights from my blog.
+                                       Connect with me for collaborations and more.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'portfolio:contact' %}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-envelope me-2"></i>Get In Touch
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

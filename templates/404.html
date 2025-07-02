@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Page Not Found - My Portfolio{% endblock %}
+{% block description %}The page you're looking for doesn't exist.{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                <div class="error-content">
+                    <div class="mb-4">
+                        <i class="bi bi-question-circle text-primary" style="font-size: 8rem;"></i>
+                    </div>
+                    <h1 class="display-1 fw-bold text-primary mb-3">404</h1>
+                    <h2 class="h3 fw-bold mb-3">Page Not Found</h2>
+                    <p class="lead text-muted mb-4">
+                        Oops! The page you're looking for doesn't exist. It might have been moved, 
+                        deleted, or you entered the wrong URL.
+                    </p>
+                    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                        <a href="{% url 'portfolio:home' %}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-house me-2"></i>Go Home
+                        </a>
+                        <a href="{% url 'portfolio:projects_list' %}" class="btn btn-outline-primary btn-lg">
+                            <i class="bi bi-collection me-2"></i>View Projects
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Helpful Links -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-4">
+                <h3 class="fw-bold">Maybe you're looking for:</h3>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-3 text-center">
+                <div class="card border-0 h-100">
+                    <div class="card-body p-4">
+                        <i class="bi bi-house text-primary fs-1 mb-3"></i>
+                        <h5 class="fw-bold">Home</h5>
+                        <p class="text-muted mb-3">Return to the homepage</p>
+                        <a href="{% url 'portfolio:home' %}" class="btn btn-outline-primary">Visit</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="card border-0 h-100">
+                    <div class="card-body p-4">
+                        <i class="bi bi-folder text-primary fs-1 mb-3"></i>
+                        <h5 class="fw-bold">Projects</h5>
+                        <p class="text-muted mb-3">Browse my portfolio</p>
+                        <a href="{% url 'portfolio:projects_list' %}" class="btn btn-outline-primary">Visit</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="card border-0 h-100">
+                    <div class="card-body p-4">
+                        <i class="bi bi-journal-text text-primary fs-1 mb-3"></i>
+                        <h5 class="fw-bold">Blog</h5>
+                        <p class="text-muted mb-3">Read my latest posts</p>
+                        <a href="{% url 'portfolio:blog_list' %}" class="btn btn-outline-primary">Visit</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="card border-0 h-100">
+                    <div class="card-body p-4">
+                        <i class="bi bi-envelope text-primary fs-1 mb-3"></i>
+                        <h5 class="fw-bold">Contact</h5>
+                        <p class="text-muted mb-3">Get in touch with me</p>
+                        <a href="{% url 'portfolio:contact' %}" class="btn btn-outline-primary">Visit</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
