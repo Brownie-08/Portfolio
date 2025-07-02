@@ -43,6 +43,7 @@ class Testimonial(models.Model):
     role = models.CharField(max_length=200)
     comment = models.TextField()
     avatar = models.ImageField(upload_to='images/testimonials/', blank=True)
+    is_featured = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     
     class Meta:
