@@ -60,6 +60,8 @@ class BlogPost(models.Model):
     excerpt = models.TextField(max_length=300, blank=True)
     body = models.TextField()
     image = models.ImageField(upload_to='images/blog/', blank=True)
+    tags = models.CharField(max_length=500, blank=True, help_text="Comma-separated list of tags")
+    is_featured = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     is_published = models.BooleanField(default=False)

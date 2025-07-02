@@ -5,19 +5,19 @@ app_name = 'portfolio'
 
 urlpatterns = [
     # Home page
-    path('', views.home, name='home'),
+    path('', views.HomeView.as_view(), name='home'),
     
     # About page
-    path('about/', views.about, name='about'),
+    path('about/', views.AboutView.as_view(), name='about'),
     
     # Projects URLs
-    path('projects/', views.projects_list, name='projects_list'),
-    path('projects/<slug:slug>/', views.project_detail, name='project_detail'),
+    path('projects/', views.ProjectListView.as_view(), name='projects_list'),
+    path('projects/<slug:slug>/', views.ProjectDetailView.as_view(), name='project_detail'),
     
     # Blog URLs
-    path('blog/', views.blog_list, name='blog_list'),
-    path('blog/<slug:slug>/', views.blog_detail, name='blog_detail'),
+    path('blog/', views.BlogListView.as_view(), name='blog_list'),
+    path('blog/<slug:slug>/', views.BlogDetailView.as_view(), name='blog_detail'),
     
     # Contact page
-    path('contact/', views.contact, name='contact'),
+    path('contact/', views.ContactView.as_view(), name='contact'),
 ]

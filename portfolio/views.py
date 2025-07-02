@@ -45,7 +45,7 @@ class AboutView(TemplateView):
         return context
 
 
-class ProjectsListView(ListView):
+class ProjectListView(ListView):
     """Projects listing page"""
     model = Project
     template_name = 'portfolio/projects_list.html'
@@ -142,7 +142,9 @@ class BlogListView(ListView):
         all_tags = set()
         for post in all_posts:
             if post.tags:
-                all_tags.update(post.tags)
+                # Split comma-separated tags
+                post_tags = [tag.strip() for tag in post.tags.split(',') if tag.strip()]
+                all_tags.update(post_tags)
         context['all_tags'] = sorted(all_tags)
         
         # Get featured posts
@@ -179,7 +181,8 @@ class BlogDetailView(DetailView):
         
         # Try to find posts with similar tags
         if current_post.tags:
-            for tag in current_post.tags:
+            post_tags = [tag.strip() for tag in current_post.tags.split(',') if tag.strip()]
+            for tag in post_tags:
                 related_posts = related_posts.filter(tags__icontains=tag)
                 if related_posts.exists():
                     break
@@ -325,7 +328,7 @@ This is an automated response. Please do not reply to this email.
 # These will call the class-based views
 home = HomeView.as_view()
 about = AboutView.as_view()
-projects_list = ProjectsListView.as_view()
+projects_list = ProjectListView.as_view()
 project_detail = ProjectDetailView.as_view()
 blog_list = BlogListView.as_view()
 blog_detail = BlogDetailView.as_view()
