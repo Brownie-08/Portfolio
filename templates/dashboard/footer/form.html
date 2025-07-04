@@ -1,0 +1,39 @@
+{% extends 'dashboard/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if object %}Edit Footer Link{% else %}Add Footer Link{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-link me-2"></i>
+                    {% if object %}Edit Footer Link{% else %}Add New Footer Link{% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                {% crispy form %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Guidelines</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled small">
+                    <li><i class="bi bi-check text-success me-1"></i>Use descriptive titles</li>
+                    <li><i class="bi bi-check text-success me-1"></i>Choose appropriate category</li>
+                    <li><i class="bi bi-check text-success me-1"></i>Set order for display sequence</li>
+                    <li><i class="bi bi-check text-success me-1"></i>Mark external links appropriately</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

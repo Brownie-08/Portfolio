@@ -1,0 +1,51 @@
+{% extends 'dashboard/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Education List{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Manage Education</h1>
+
+<div class="d-flex justify-content-end mb-3">
+    <a href="{% url 'dashboard:education_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-2"></i>Add Education
+    </a>
+</div>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>#</th>
+            <th>School</th>
+            <th>Degree</th>
+            <th>Field</th>
+            <th>Dates</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for education in educations %}
+        <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ education.school_name }}</td>
+            <td>{{ education.degree }}</td>
+            <td>{{ education.field_of_study }}</td>
+            <td>{{ education.duration }}</td>
+            <td>
+                <a href="{% url 'dashboard:education_edit' education.pk %}" class="btn btn-sm btn-outline-info">
+                    <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'dashboard:education_delete' education.pk %}" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-trash"></i>
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center">No education entries found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

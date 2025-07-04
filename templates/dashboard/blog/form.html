@@ -1,0 +1,103 @@
+{% extends 'dashboard/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if object %}Edit Blog Post{% else %}Create Blog Post{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="bi bi-{% if object %}pencil{% else %}plus-circle{% endif %} me-2"></i>
+                {% if object %}Edit Blog Post{% else %}Create Blog Post{% endif %}
+            </h1>
+            <a href="{% url 'dashboard:blog_posts' %}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Blog Posts
+            </a>
+        </div>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                {% crispy form %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Writing Tips</h5>
+            </div>
+            <div class="card-body">
+                <h6>Blog Title</h6>
+                <p class="small text-muted">Choose an engaging title that accurately describes your post content.</p>
+                
+                <h6>Excerpt</h6>
+                <p class="small text-muted">Write a compelling summary (300 characters max) that will appear on your blog listing page.</p>
+                
+                <h6>Content</h6>
+                <p class="small text-muted">Write your full blog post content. You can use HTML tags for formatting.</p>
+                
+                <h6>Featured Image</h6>
+                <p class="small text-muted">Upload a relevant image (1200x600px recommended). This will be the hero image for your post.</p>
+                
+                <h6>Tags</h6>
+                <p class="small text-muted">Add relevant tags separated by commas (e.g., "Django, Python, Web Development").</p>
+                
+                <h6>Publishing</h6>
+                <p class="small text-muted">
+                    <strong>Featured:</strong> Featured posts appear prominently on your homepage.<br>
+                    <strong>Published:</strong> Only published posts are visible to site visitors.
+                </p>
+            </div>
+        </div>
+        
+        {% if object and object.image %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-image me-2"></i>Current Featured Image</h5>
+            </div>
+            <div class="card-body text-center">
+                <img src="{{ object.image.url }}" alt="{{ object.title }}" class="img-fluid rounded">
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if object %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-link-45deg me-2"></i>Quick Links</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ object.get_absolute_url }}" class="btn btn-sm btn-outline-info" target="_blank">
+                        <i class="bi bi-eye me-2"></i>View on Site
+                    </a>
+                    {% if object.is_published %}
+                        <span class="badge bg-success">Published</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Draft</span>
+                    {% endif %}
+                    {% if object.is_featured %}
+                        <span class="badge bg-warning">Featured</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

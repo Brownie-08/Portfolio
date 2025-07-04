@@ -1,0 +1,86 @@
+{% extends 'dashboard/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Personal Information{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="bi bi-person-circle me-2"></i>Personal Information</h1>
+            <a href="{% url 'dashboard:home' %}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                {% crispy form %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Tips</h5>
+            </div>
+            <div class="card-body">
+                <h6>Profile Image</h6>
+                <p class="small text-muted">Upload a professional headshot (400x400px recommended). Supported formats: JPG, PNG.</p>
+                
+                <h6>Bio</h6>
+                <p class="small text-muted">Write a compelling bio that highlights your skills, experience, and what makes you unique.</p>
+                
+                <h6>Social Links</h6>
+                <p class="small text-muted">Add your professional social media profiles to help visitors connect with you.</p>
+                
+                <h6>Resume/CV</h6>
+                <p class="small text-muted">Upload your latest resume in PDF format. This will be available for download on your About page.</p>
+            </div>
+        </div>
+        
+        {% if object.profile_image %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-image me-2"></i>Current Profile Image</h5>
+            </div>
+            <div class="card-body text-center">
+                <img src="{{ object.profile_image.url }}" alt="Profile Image" class="img-fluid rounded" style="max-width: 200px;">
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if object.resume %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-file-earmark-pdf me-2"></i>Current Resume/CV</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-2">
+                    <strong>File:</strong> {{ object.resume.name|default:"No file uploaded" }}
+                </p>
+                {% if object.resume %}
+                    <a href="{{ object.resume.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                        <i class="bi bi-download me-1"></i>Download Current CV
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

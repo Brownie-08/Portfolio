@@ -1,4 +1,48 @@
 from django.core.management.base import BaseCommand
+from django.utils import timezone
+from portfolio.models import BlogPost
+
+
+class Command(BaseCommand):
+    help = 'Create sample blog posts'
+
+    def handle(self, *args, **kwargs):
+        # Delete existing sample posts
+        BlogPost.objects.filter(title__startswith='[Sample]').delete()
+
+        # Sample posts
+        posts = [
+            BlogPost(
+                title='[Sample] Introduction to Python',
+                body='Python is a powerful, high-level programming language. It is known for its readability and versatility...',
+                created=timezone.now(),
+                is_published=True,
+            ),
+            BlogPost(
+                title='[Sample] Getting Started with Django',
+                body='Django is a high-level Python web framework that encourages rapid development and clean, pragmatic design...',
+                created=timezone.now(),
+                is_published=True,
+            ),
+            BlogPost(
+                title='[Sample] Understanding MySQL, PostgreSQL, and SQLite',
+                body='MySQL, PostgreSQL, and SQLite are popular relational database management systems, each with its own strengths...',
+                created=timezone.now(),
+                is_published=True,
+            ),
+            BlogPost(
+                title='[Sample] Effective Development Practices',
+                body='Effective development practices include code versioning, testing, and code reviews to ensure robust and maintainable software...',
+                created=timezone.now(),
+                is_published=True,
+            ),
+        ]
+
+        # Bulk create sample posts
+        BlogPost.objects.bulk_create(posts)
+        self.stdout.write(self.style.SUCCESS('Successfully created sample blog posts.'))
+
+from django.core.management.base import BaseCommand
 from django.core.files.uploadedfile import SimpleUploadedFile
 from PIL import Image
 from io import BytesIO

@@ -1,0 +1,125 @@
+// =============================================================================
+// MIXINS - Reusable SCSS Mixins
+// =============================================================================
+
+// Button mixins
+@mixin button-variant($bg-color, $hover-bg-color: darken($bg-color, 10%), $text-color: $white) {
+  background-color: $bg-color;
+  color: $text-color;
+  border: none;
+  transition: all $transition-base;
+  
+  &:hover {
+    background-color: $hover-bg-color;
+    transform: translateY(-1px);
+    box-shadow: $shadow-md;
+  }
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba($bg-color, 0.25);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Card styles
+@mixin card-style($shadow: $shadow, $hover-shadow: $shadow-lg) {
+  background: $white;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow;
+  transition: all $transition-base;
+  
+  &:hover {
+    box-shadow: $hover-shadow;
+    transform: translateY(-2px);
+  }
+}
+
+// Responsive breakpoints
+@mixin media-sm {
+  @media (min-width: $breakpoint-sm) {
+    @content;
+  }
+}
+
+@mixin media-md {
+  @media (min-width: $breakpoint-md) {
+    @content;
+  }
+}
+
+@mixin media-lg {
+  @media (min-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin media-xl {
+  @media (min-width: $breakpoint-xl) {
+    @content;
+  }
+}
+
+// Text truncation
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Flexbox utilities
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// Gradient backgrounds
+@mixin gradient-bg($start-color, $end-color, $direction: 135deg) {
+  background: linear-gradient($direction, $start-color, $end-color);
+}
+
+// Focus styles
+@mixin focus-ring($color: $primary-color) {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba($color, 0.25);
+}
+
+// Animation keyframes
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+// Animation classes
+@mixin animate-fade-in-up($duration: 0.6s, $delay: 0s) {
+  animation: fadeInUp $duration ease-out $delay both;
+}
+
+@mixin animate-pulse($duration: 2s) {
+  animation: pulse $duration ease-in-out infinite;
+}

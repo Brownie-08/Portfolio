@@ -1,0 +1,63 @@
+{% extends 'dashboard/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Certifications List{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Manage Certifications</h1>
+
+<div class="d-flex justify-content-end mb-3">
+    <a href="{% url 'dashboard:certification_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-2"></i>Add Certification
+    </a>
+</div>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Organization</th>
+            <th>Issue Date</th>
+            <th>Status</th>
+            <th>Featured</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for certification in certifications %}
+        <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ certification.name }}</td>
+            <td>{{ certification.issuing_organization }}</td>
+            <td>{{ certification.issue_date|date:"M Y" }}</td>
+            <td>
+                {% if certification.is_expired %}
+                    <span class="badge bg-danger">Expired</span>
+                {% else %}
+                    <span class="badge bg-success">Valid</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if certification.is_featured %}
+                    <span class="badge bg-warning">Featured</span>
+                {% endif %}
+            </td>
+            <td>
+                <a href="{% url 'dashboard:certification_edit' certification.pk %}" class="btn btn-sm btn-outline-info">
+                    <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'dashboard:certification_delete' certification.pk %}" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-trash"></i>
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7" class="text-center">No certifications found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

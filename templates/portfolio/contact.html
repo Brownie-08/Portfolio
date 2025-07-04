@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Contact - My Portfolio{% endblock %}
+{% block title %}Contact - {{ portfolio_name }}{% endblock %}
 {% block description %}Get in touch with me for collaborations, questions, or just to say hello.{% endblock %}
 
 {% block content %}
@@ -122,17 +122,29 @@
                                 <i class="bi bi-envelope text-primary me-3 fs-5 mt-1"></i>
                                 <div>
                                     <h6 class="fw-semibold mb-1">Email</h6>
-                                    <a href="mailto:hello@myportfolio.com" class="text-muted">hello@myportfolio.com</a>
+                                    <a href="mailto:{{ personal_info.email }}" class="text-muted">{{ personal_info.email }}</a>
                                 </div>
                             </div>
                         </div>
+                        
+                        {% if personal_info.phone %}
+                        <div class="contact-item mb-3">
+                            <div class="d-flex align-items-start">
+                                <i class="bi bi-telephone text-primary me-3 fs-5 mt-1"></i>
+                                <div>
+                                    <h6 class="fw-semibold mb-1">Phone</h6>
+                                    <a href="tel:{{ personal_info.phone }}" class="text-muted">{{ personal_info.phone }}</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
                         
                         <div class="contact-item mb-3">
                             <div class="d-flex align-items-start">
                                 <i class="bi bi-geo-alt text-primary me-3 fs-5 mt-1"></i>
                                 <div>
                                     <h6 class="fw-semibold mb-1">Location</h6>
-                                    <p class="text-muted mb-0">City, Country</p>
+                                    <p class="text-muted mb-0">{{ personal_info.location|default:"City, Country" }}</p>
                                 </div>
                             </div>
                         </div>
@@ -157,18 +169,30 @@
                         </h4>
                         
                         <div class="d-grid gap-2">
-                            <a href="https://linkedin.com" target="_blank" rel="noopener" 
+                            {% if personal_info.linkedin_url %}
+                            <a href="{{ personal_info.linkedin_url }}" target="_blank" rel="noopener" 
                                class="btn btn-outline-primary d-flex align-items-center">
                                 <i class="bi bi-linkedin me-2"></i>LinkedIn
                             </a>
-                            <a href="https://github.com" target="_blank" rel="noopener" 
+                            {% endif %}
+                            {% if personal_info.github_url %}
+                            <a href="{{ personal_info.github_url }}" target="_blank" rel="noopener" 
                                class="btn btn-outline-dark d-flex align-items-center">
                                 <i class="bi bi-github me-2"></i>GitHub
                             </a>
-                            <a href="https://twitter.com" target="_blank" rel="noopener" 
+                            {% endif %}
+                            {% if personal_info.twitter_url %}
+                            <a href="{{ personal_info.twitter_url }}" target="_blank" rel="noopener" 
                                class="btn btn-outline-info d-flex align-items-center">
                                 <i class="bi bi-twitter me-2"></i>Twitter
                             </a>
+                            {% endif %}
+                            {% if personal_info.phone_url %}
+                            <a href="{{ personal_info.phone_url }}" target="_blank" rel="noopener" 
+                               class="btn btn-outline-info d-flex align-items-center">
+                                <i class="bi bi-phone me-2"></i>Phone
+                            </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

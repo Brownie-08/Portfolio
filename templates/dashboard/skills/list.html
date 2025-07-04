@@ -1,0 +1,100 @@
+{% extends "dashboard/base.html" %}
+{% load crispy_forms_tags %}
+{% load portfolio_extras %}
+
+{% block title %}Skills Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-gear me-2"></i>Skills Management</h2>
+                <a href="{% url 'dashboard:skill_create' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Add Skill
+                </a>
+            </div>
+
+            {% if skills_by_category %}
+                {% for category_name, skills in skills_by_category.items %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">{{ category_name }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Proficiency</th>
+                                        <th>Order</th>
+                                        <th>Featured</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for skill in skills %}
+                                    <tr>
+                                        <td>
+                                            {% if skill.icon_class %}
+                                            <i class="{{ skill.icon_class }} me-2"></i>
+                                            {% endif %}
+                                            <strong>{{ skill.name }}</strong>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress me-2" style="width: 100px;">
+                                                    <div class="progress-bar" role="progressbar" 
+                                                         style="width: {{ skill.proficiency|mul:20 }}%"
+                                                         aria-valuenow="{{ skill.proficiency }}" 
+                                                         aria-valuemin="0" aria-valuemax="5">
+                                                    </div>
+                                                </div>
+                                                <small>{{ skill.proficiency }}/5</small>
+                                            </div>
+                                        </td>
+                                        <td>{{ skill.order }}</td>
+                                        <td>
+                                            {% if skill.is_featured %}
+                                            <span class="badge bg-primary">Featured</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">Not Featured</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{% url 'dashboard:skill_edit' skill.pk %}" 
+                                                   class="btn btn-outline-primary">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a href="{% url 'dashboard:skill_delete' skill.pk %}" 
+                                                   class="btn btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-gear text-muted" style="font-size: 4rem;"></i>
+                    <h4 class="mt-3 text-muted">No skills found</h4>
+                    <p class="text-muted">Add your first skill to get started.</p>
+                    <a href="{% url 'dashboard:skill_create' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Add Skill
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -8,7 +8,8 @@ from django.conf import settings
 
 from .models import (
     Tag, Project, Testimonial, 
-    BlogPost, ContactMessage
+    BlogPost, ContactMessage, PersonalInfo, Education, Certification, Award,
+    Skill, CareerTimeline, FooterLink
 )
 from .forms import ContactForm
 
@@ -33,14 +34,39 @@ class HomeView(TemplateView):
 
 
 class AboutView(TemplateView):
-    """About page with testimonials"""
+    """About page with enhanced dynamic content"""
     template_name = 'portfolio/about.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Get all testimonials
-        context['testimonials'] = Testimonial.objects.all()
+        # Get personal information
+        context['personal_info'] = PersonalInfo.get_active()
+        
+        # Get all skills grouped by category
+        context['skills'] = Skill.objects.all()
+        context['skills_by_category'] = {}
+        for choice in Skill.SKILL_CATEGORIES:
+            category_key = choice[0]
+            category_name = choice[1]
+            skills = Skill.objects.filter(category=category_key).order_by('order', 'name')
+            if skills.exists():
+                context['skills_by_category'][category_name] = skills
+        
+        # Get career timeline
+        context['career_timeline'] = CareerTimeline.objects.all()
+        
+        # Get featured testimonials
+        context['testimonials'] = Testimonial.objects.filter(is_featured=True)
+        
+        # Get all education entries
+        context['educations'] = Education.objects.all()
+        
+        # Get featured certifications
+        context['certifications'] = Certification.objects.filter(is_featured=True)
+        
+        # Get featured awards
+        context['awards'] = Award.objects.filter(is_featured=True)
         
         return context
 
@@ -77,6 +103,9 @@ class ProjectListView(ListView):
         
         # Get all tags for filtering
         context['tags'] = Tag.objects.all().order_by('name')
+        
+        # Get featured projects for the featured section
+        context['featured_projects'] = Project.objects.filter(is_featured=True)
         
         # Pass current filters
         context['current_search'] = self.request.GET.get('search', '')
@@ -147,10 +176,13 @@ class BlogListView(ListView):
                 all_tags.update(post_tags)
         context['all_tags'] = sorted(all_tags)
         
-        # Get featured posts
-        context['featured_posts'] = BlogPost.objects.filter(
+        # Get featured post (single)
+        context['featured_post'] = BlogPost.objects.filter(
             is_published=True, is_featured=True
-        )[:3]
+        ).first()
+        
+        # Get all posts for context
+        context['posts'] = self.get_queryset()
         
         # Pass current filters
         context['current_search'] = self.request.GET.get('search', '')

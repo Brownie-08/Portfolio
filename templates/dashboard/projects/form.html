@@ -1,0 +1,102 @@
+{% extends 'dashboard/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if object %}Edit Project{% else %}Create Project{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="bi bi-{% if object %}pencil{% else %}plus-circle{% endif %} me-2"></i>
+                {% if object %}Edit Project{% else %}Create Project{% endif %}
+            </h1>
+            <a href="{% url 'dashboard:projects' %}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Projects
+            </a>
+        </div>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                {% crispy form %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Tips</h5>
+            </div>
+            <div class="card-body">
+                <h6>Project Title</h6>
+                <p class="small text-muted">Choose a clear, descriptive title that represents your project well.</p>
+                
+                <h6>Description</h6>
+                <p class="small text-muted">Provide a detailed description of what the project does, the problems it solves, and your role.</p>
+                
+                <h6>Tech Stack</h6>
+                <p class="small text-muted">List technologies separated by commas (e.g., "Python, Django, React, PostgreSQL").</p>
+                
+                <h6>Project Image</h6>
+                <p class="small text-muted">Upload a screenshot or mockup (1200x600px recommended). Supported formats: JPG, PNG.</p>
+                
+                <h6>Links</h6>
+                <p class="small text-muted">Add links to the live project and GitHub repository to showcase your work.</p>
+                
+                <h6>Featured Project</h6>
+                <p class="small text-muted">Featured projects appear prominently on your homepage. Choose your best work!</p>
+            </div>
+        </div>
+        
+        {% if object and object.image %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-image me-2"></i>Current Image</h5>
+            </div>
+            <div class="card-body text-center">
+                <img src="{{ object.image.url }}" alt="{{ object.title }}" class="img-fluid rounded">
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if object %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-link-45deg me-2"></i>Quick Links</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ object.get_absolute_url }}" class="btn btn-sm btn-outline-info" target="_blank">
+                        <i class="bi bi-eye me-2"></i>View on Site
+                    </a>
+                    {% if object.live_url %}
+                        <a href="{{ object.live_url }}" class="btn btn-sm btn-outline-success" target="_blank">
+                            <i class="bi bi-globe me-2"></i>View Live Project
+                        </a>
+                    {% endif %}
+                    {% if object.repo_url %}
+                        <a href="{{ object.repo_url }}" class="btn btn-sm btn-outline-dark" target="_blank">
+                            <i class="bi bi-github me-2"></i>View Repository
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

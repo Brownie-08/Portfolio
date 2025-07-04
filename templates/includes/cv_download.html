@@ -1,0 +1,68 @@
+{% comment %}
+Universal CV Download Button Component
+-------------------------------------
+This template provides a reusable CV download button that can be included anywhere in the site.
+It automatically checks if personal_info.resume exists and shows the appropriate button style.
+
+Usage:
+  {% include 'includes/cv_download.html' %}
+  
+Parameters (optional):
+  - button_class: Custom CSS classes for the button
+  - button_text: Custom text for the button
+  - icon_class: Custom icon classes (default: "bi bi-download")
+  - show_icon: Whether to show the icon (default: True unless context is navbar)
+  - target: Link target attribute (default: "_blank")
+  - button_context: Button context for styling ('navbar', 'footer', 'page', 'cta')
+
+Examples:
+  Basic usage:
+    {% include 'includes/cv_download.html' %}
+  
+  Custom styling:
+    {% include 'includes/cv_download.html' with button_class="btn btn-outline-primary" button_text="Get My Resume" %}
+  
+  Navbar usage:
+    {% include 'includes/cv_download.html' with button_context="navbar" %}
+  
+  Footer usage:
+    {% include 'includes/cv_download.html' with button_context="footer" %}
+    
+  CTA usage:
+    {% include 'includes/cv_download.html' with button_context="cta" %}
+{% endcomment %}
+
+{% if personal_info.resume %}
+    {% if button_context == "navbar" %}
+        <li class="nav-item">
+            <a class="{{ button_class|default:'nav-link' }}" href="{{ personal_info.resume.url }}" target="{{ target|default:'_blank' }}">
+                {% if show_icon and icon_class %}
+                    <i class="{{ icon_class|default:'bi bi-download' }} me-1"></i>
+                {% endif %}
+                {{ button_text|default:"CV" }}
+            </a>
+        </li>
+    {% elif button_context == "footer" %}
+        <a href="{{ personal_info.resume.url }}" class="{{ button_class|default:'btn btn-outline-light btn-sm' }}" target="{{ target|default:'_blank' }}">
+            {% if show_icon|default:True %}
+                <i class="{{ icon_class|default:'bi bi-download' }} me-1"></i>
+            {% endif %}
+            {{ button_text|default:"Download CV" }}
+        </a>
+    {% elif button_context == "cta" %}
+        <a href="{{ personal_info.resume.url }}" class="{{ button_class|default:'btn btn-primary btn-lg' }}" target="{{ target|default:'_blank' }}">
+            {% if show_icon|default:True %}
+                <i class="{{ icon_class|default:'bi bi-download' }} me-1"></i>
+            {% endif %}
+            {{ button_text|default:"Download Resume" }}
+        </a>
+    {% else %}
+        {% comment %}Default page context{% endcomment %}
+        <a href="{{ personal_info.resume.url }}" class="{{ button_class|default:'btn btn-primary' }}" target="{{ target|default:'_blank' }}">
+            {% if show_icon|default:True %}
+                <i class="{{ icon_class|default:'bi bi-download' }} me-1"></i>
+            {% endif %}
+            {{ button_text|default:"Download Resume" }}
+        </a>
+    {% endif %}
+{% endif %}

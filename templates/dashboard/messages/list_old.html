@@ -1,0 +1,131 @@
+{% extends 'dashboard/base.html' %}
+{% load portfolio_extras %}
+
+{% block title %}Contact Messages{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="bi bi-envelope me-2"></i>Contact Messages</h1>
+            <a href="{% url 'dashboard:home' %}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Messages ({{ messages|length }})</h5>
+                <div>
+                    <span class="badge bg-warning">{{ messages|length|add:"-1" }} Unread</span>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if messages %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>From</th>
+                                    <th>Subject</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for msg in messages %}
+                                    <tr class="{% if not msg.is_read %}table-warning{% endif %}">
+                                        <td>
+                                            {% if msg.is_read %}
+                                                <i class="bi bi-envelope-open text-success" title="Read"></i>
+                                            {% else %}
+                                                <i class="bi bi-envelope text-warning" title="Unread"></i>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <strong>{{ msg.name }}</strong>
+                                                <br><small class="text-muted">{{ msg.email }}</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <strong>{{ msg.subject }}</strong>
+                                                <br><small class="text-muted">{{ msg.message|truncatechars:50 }}</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">{{ msg.created|date:"M d, Y H:i" }}</small>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'dashboard:message_detail' msg.pk %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if is_paginated %}
+                        <nav aria-label="Messages pagination">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">First</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                    </li>
+                                {% endif %}
+                                
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+                                
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-envelope display-1 text-muted"></i>
+                        <h4 class="mt-3">No messages yet</h4>
+                        <p class="text-muted">
+                            When visitors send you messages through your contact form, they'll appear here.
+                        </p>
+                        <a href="/contact/" class="btn btn-outline-primary" target="_blank">
+                            <i class="bi bi-eye me-2"></i>View Contact Page
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

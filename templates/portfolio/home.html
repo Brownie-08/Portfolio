@@ -1,30 +1,36 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Home - My Portfolio{% endblock %}
+{% block title %}Home - {{ portfolio_name }}{% endblock %}
 {% block description %}Welcome to my professional portfolio showcasing my projects, skills, and experience as a developer.{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
-<section class="bg-primary text-white py-5">
+<section class="hero-section">
     <div class="container">
-        <div class="row align-items-center min-vh-50">
+        <div class="row align-items-center min-vh-75">
             <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-4">Hello, I'm a Developer</h1>
-                <p class="lead mb-4">Passionate about creating innovative solutions and bringing ideas to life through code. Welcome to my digital showcase.</p>
-                <div class="d-flex flex-wrap gap-3">
-                    <a href="{% url 'portfolio:projects_list' %}" class="btn btn-light btn-lg">
+                <h1 class="hero-title">Hello, I'm {{ personal_info.full_name|default:"a Developer" }}</h1>
+                {% if personal_info.bio %}
+                <p class="hero-subtitle">{{ personal_info.bio }}</p>
+                {% else %}
+                <p class="hero-subtitle">Passionate about creating innovative solutions and bringing ideas to life through code. Welcome to my digital showcase where technology meets creativity.</p>
+                {% endif %}
+<div class="hero-cta d-flex flex-wrap gap-3">
+                    <a href="{% url 'portfolio:projects_list' %}" class="btn btn-light btn-lg px-4 py-3">
                         <i class="bi bi-folder me-2"></i>View My Work
                     </a>
-                    <a href="{% url 'portfolio:contact' %}" class="btn btn-outline-light btn-lg">
-                        <i class="bi bi-envelope me-2"></i>Get In Touch
+                    <a href="{% url 'portfolio:contact' %}" class="btn btn-outline-light btn-lg px-4 py-3">
+                        <i class="bi bi-envelope me-2"></i>Contact Me
                     </a>
+                    {% include 'includes/cv_download.html' with button_context="cta" button_class="btn btn-outline-light btn-lg px-4 py-3" %}
                 </div>
             </div>
             <div class="col-lg-6 text-center">
-                <div class="hero-image">
-                    <!-- Placeholder for hero image or animation -->
-                    <i class="bi bi-laptop display-1 opacity-75"></i>
+                <div class="hero-image position-relative">
+                    <div class="hero-graphic d-inline-flex align-items-center justify-content-center">
+                        <i class="bi bi-code-slash text-white opacity-75" style="font-size: 8rem;"></i>
+                    </div>
                 </div>
             </div>
         </div>
@@ -41,31 +47,31 @@
             </div>
         </div>
         <div class="row g-4">
-            <div class="col-md-4">
-                <div class="text-center">
-                    <div class="bg-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
-                        <i class="bi bi-code-square text-white fs-2"></i>
+            <div class="col-md-4 fade-in-up-delay-1">
+                <div class="text-center p-4">
+                    <div class="bg-primary rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center shadow-lg" style="width: 100px; height: 100px;">
+                        <i class="bi bi-code-square text-white" style="font-size: 2.5rem;"></i>
                     </div>
-                    <h4>Frontend Development</h4>
-                    <p class="text-muted">Creating responsive and interactive user interfaces with modern frameworks and technologies.</p>
+                    <h4 class="fw-bold mb-3">Frontend Development</h4>
+                    <p class="text-muted">Creating responsive and interactive user interfaces with modern frameworks like Bootstrap, Tailwind CSS, jQuery and JavaScript.</p>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="text-center">
-                    <div class="bg-success rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
-                        <i class="bi bi-server text-white fs-2"></i>
+            <div class="col-md-4 fade-in-up-delay-2">
+                <div class="text-center p-4">
+                    <div class="bg-secondary rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center shadow-lg" style="width: 100px; height: 100px;">
+                        <i class="bi bi-server text-white" style="font-size: 2.5rem;"></i>
                     </div>
-                    <h4>Backend Development</h4>
-                    <p class="text-muted">Building robust server-side applications and APIs with scalable architecture.</p>
+                    <h4 class="fw-bold mb-3">Backend Development</h4>
+                    <p class="text-muted">Building robust server-side applications and APIs with Python, Django,  and scalable cloud architecture.</p>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="text-center">
-                    <div class="bg-info rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
-                        <i class="bi bi-database text-white fs-2"></i>
+            <div class="col-md-4 fade-in-up-delay-3">
+                <div class="text-center p-4">
+                    <div class="bg-accent rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center shadow-lg" style="width: 100px; height: 100px;">
+                        <i class="bi bi-database text-white" style="font-size: 2.5rem;"></i>
                     </div>
-                    <h4>Database Design</h4>
-                    <p class="text-muted">Designing efficient database schemas and optimizing data storage solutions.</p>
+                    <h4 class="fw-bold mb-3">Database Design</h4>
+                    <p class="text-muted">Designing efficient database schemas and optimizing data storage with MySQL, PostgreSQL, and MongoDB.</p>
                 </div>
             </div>
         </div>
@@ -84,27 +90,45 @@
         </div>
         <div class="row g-4">
             {% for project in featured_projects %}
-                <div class="col-lg-4 col-md-6">
-                    <div class="card h-100 shadow-sm hover-lift">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="project-card card h-100 border-0">
                         {% if project.image %}
-                            <img src="{{ project.image.url }}" class="card-img-top" alt="{{ project.title }}" style="height: 200px; object-fit: cover;">
+                            <img src="{{ project.image.url }}" class="card-img-top" alt="{{ project.title }}">
                         {% else %}
-                            <div class="bg-primary card-img-top d-flex align-items-center justify-content-center" style="height: 200px;">
-                                <i class="bi bi-image text-white fs-1"></i>
+                            <div class="bg-gradient-primary card-img-top d-flex align-items-center justify-content-center" style="height: 200px; background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));">
+                                <i class="bi bi-code-slash text-white" style="font-size: 3rem;"></i>
                             </div>
                         {% endif %}
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">{{ project.title }}</h5>
-                            <p class="card-text flex-grow-1">{{ project.description|truncatewords:25 }}</p>
+                        <div class="card-body d-flex flex-column p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title fw-bold">{{ project.title }}</h5>
+                                {% if project.is_github_synced %}
+                                    <span class="badge bg-primary"><i class="bi bi-github"></i></span>
+                                {% endif %}
+                            </div>
+                            <p class="card-text flex-grow-1 text-muted">{{ project.description|truncatewords:20 }}</p>
                             <div class="mt-auto">
                                 <div class="d-flex flex-wrap gap-1 mb-3">
-                                    {% for tech in project.tech_stack|slice:":3" %}
-                                        <span class="badge bg-secondary">{{ tech|title }}</span>
+                                    {% for tech in project.tech_stack_list|slice:":3" %}
+                                        <span class="badge bg-light text-dark border">{{ tech|title }}</span>
                                     {% endfor %}
                                 </div>
-                                <a href="{{ project.get_absolute_url }}" class="btn btn-primary">
-                                    <i class="bi bi-arrow-right me-1"></i>View Details
-                                </a>
+                                {% if project.github_stars %}
+                                    <div class="d-flex align-items-center mb-3 text-muted small">
+                                        <i class="bi bi-star me-1"></i>{{ project.github_stars }}
+                                        <i class="bi bi-diagram-3 ms-3 me-1"></i>{{ project.github_forks }}
+                                    </div>
+                                {% endif %}
+                                <div class="d-flex gap-2">
+                                    <a href="{{ project.get_absolute_url }}" class="btn btn-primary flex-grow-1">
+                                        <i class="bi bi-arrow-right me-1"></i>View Details
+                                    </a>
+                                    {% if project.repo_url %}
+                                        <a href="{{ project.repo_url }}" class="btn btn-outline-secondary" target="_blank">
+                                            <i class="bi bi-github"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -195,14 +219,46 @@
 
 {% block extra_css %}
 <style>
-    .hover-lift {
-        transition: transform 0.3s ease;
+    .min-vh-75 {
+        min-height: 75vh;
     }
-    .hover-lift:hover {
-        transform: translateY(-5px);
+    
+    .hero-graphic {
+        position: relative;
+        z-index: 2;
     }
-    .min-vh-50 {
-        min-height: 50vh;
+    
+    .hero-graphic::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        left: -20px;
+        right: -20px;
+        bottom: -20px;
+        background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+        border-radius: 50%;
+        z-index: -1;
+        animation: pulse 3s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.8; }
+        50% { transform: scale(1.05); opacity: 0.6; }
+    }
+    
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-info) 100%) !important;
+    }
+    
+    .project-card {
+        transition: all 0.3s ease;
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+    
+    .project-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
     }
 </style>
 {% endblock %}

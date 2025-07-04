@@ -1,0 +1,36 @@
+{% comment %}
+Test template to verify CV download include functionality
+Run this as a quick test to ensure the include works in different contexts
+{% endcomment %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CV Download Include Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="container py-4">
+    <h1>CV Download Include Test</h1>
+    
+    <h3>1. Basic Usage (Default context)</h3>
+    {% include 'includes/cv_download.html' %}
+    
+    <h3 class="mt-4">2. Navbar Context</h3>
+    <ul class="navbar-nav">
+        {% include 'includes/cv_download.html' with button_context="navbar" %}
+    </ul>
+    
+    <h3 class="mt-4">3. Footer Context</h3>
+    {% include 'includes/cv_download.html' with button_context="footer" %}
+    
+    <h3 class="mt-4">4. CTA Context</h3>
+    {% include 'includes/cv_download.html' with button_context="cta" %}
+    
+    <h3 class="mt-4">5. Custom Styling</h3>
+    {% include 'includes/cv_download.html' with button_class="btn btn-success" button_text="Get My CV" %}
+    
+    <h3 class="mt-4">6. No Icon</h3>
+    {% include 'includes/cv_download.html' with show_icon=False button_text="Resume PDF" %}
+</body>
+</html>

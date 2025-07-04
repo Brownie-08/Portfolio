@@ -1,0 +1,40 @@
+{% extends 'dashboard/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if object %}Edit Skill{% else %}Add Skill{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-gear me-2"></i>
+                    {% if object %}Edit Skill{% else %}Add New Skill{% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                {% crispy form %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Guidelines</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled small">
+                    <li><i class="bi bi-check text-success me-1"></i>Choose appropriate category</li>
+                    <li><i class="bi bi-check text-success me-1"></i>Rate proficiency 1-5 (1=Beginner, 5=Expert)</li>
+                    <li><i class="bi bi-check text-success me-1"></i>Use clear skill names</li>
+                    <li><i class="bi bi-check text-success me-1"></i>Add icons for visual appeal</li>
+                    <li><i class="bi bi-check text-success me-1"></i>Mark important skills as featured</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

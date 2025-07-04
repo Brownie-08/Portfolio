@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
+{% load portfolio_extras %}
 {% load static %}
 
-{% block title %}Projects - My Portfolio{% endblock %}
+{% block title %}Projects - {{ portfolio_name }}{% endblock %}
 {% block description %}Explore my portfolio projects showcasing diverse skills and innovative solutions.{% endblock %}
 
 {% block content %}
@@ -10,7 +11,7 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8">
-                <h1 class="display-4 fw-bold">My Projects</h1>
+                <h1 class="display-4 fw-bold">{{ personal_info.full_name|default:"My" }} Projects</h1>
                 <p class="lead">Showcasing a collection of projects that demonstrate my skills and expertise in various technologies.</p>
             </div>
             <div class="col-lg-4 text-center">
@@ -57,7 +58,7 @@
                                     <p class="card-text flex-grow-1">{{ project.description|truncatewords:25 }}</p>
                                     <div class="mt-auto">
                                         <div class="d-flex flex-wrap gap-1 mb-3">
-                                            {% for tech in project.tech_stack.split:','|slice:':3' %}
+                                            {% for tech in project.tech_stack|split:","|slice:":3" %}
                                                 <span class="badge bg-secondary">{{ tech|trim }}</span>
                                             {% endfor %}
                                         </div>
@@ -118,7 +119,7 @@
                                 
                                 <div class="mt-auto">
                                     <div class="d-flex flex-wrap gap-1 mb-3">
-                                        {% for tech in project.tech_stack.split:','|slice:':3' %}
+                                        {% for tech in project.tech_stack|split:","|slice:":3" %}
                                             <span class="badge bg-light text-dark">{{ tech|trim }}</span>
                                         {% endfor %}
                                     </div>

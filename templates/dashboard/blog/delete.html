@@ -1,0 +1,80 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Delete Blog Post{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="bi bi-trash me-2"></i>Delete Blog Post</h1>
+            <a href="{% url 'dashboard:blog_posts' %}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Blog Posts
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Confirm Deletion</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-warning me-2"></i>
+                    <strong>Warning:</strong> This action cannot be undone. The blog post and all its data will be permanently deleted.
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        {% if object.image %}
+                            <img src="{{ object.image.url }}" alt="{{ object.title }}" class="img-fluid rounded">
+                        {% else %}
+                            <div class="bg-primary rounded d-flex align-items-center justify-content-center text-white" 
+                                 style="height: 150px;">
+                                <i class="bi bi-journal-text fs-1"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-8">
+                        <h4>{{ object.title }}</h4>
+                        <p class="text-muted">{{ object.excerpt|default:object.body|truncatewords:30 }}</p>
+                        
+                        <div class="mb-3">
+                            <strong>Tags:</strong> {{ object.tags|default:"None" }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {% if object.is_published %}
+                                <span class="badge bg-success">Published</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Draft</span>
+                            {% endif %}
+                            {% if object.is_featured %}
+                                <span class="badge bg-warning">Featured</span>
+                            {% endif %}
+                        </div>
+                        
+                        <small class="text-muted">Created: {{ object.created|date:"M d, Y" }}</small>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <p><strong>Are you sure you want to delete "{{ object.title }}"?</strong></p>
+                
+                <form method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger me-2">
+                        <i class="bi bi-trash me-1"></i>Yes, Delete Blog Post
+                    </button>
+                    <a href="{% url 'dashboard:blog_posts' %}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle me-1"></i>Cancel
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

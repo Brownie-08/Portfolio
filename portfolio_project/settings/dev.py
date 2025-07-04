@@ -18,13 +18,43 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0', c
 # Using environment variables with SQLite as fallback
 DATABASE_URL = config('DATABASE_URL', default=None)
 
-if DATABASE_URL:
+# Check for separate MySQL settings first
+DB_ENGINE = config('DB_ENGINE', default=None)
+DB_NAME = config('DB_NAME', default=None)
+DB_USER = config('DB_USER', default=None)
+DB_PASSWORD = config('DB_PASSWORD', default=None)
+DB_HOST = config('DB_HOST', default='localhost')
+DB_PORT = config('DB_PORT', default=3306, cast=int)
+
+if DB_ENGINE and DB_NAME:
+    # Use separate database settings
+    DATABASES = {
+        'default': {
+            'ENGINE': DB_ENGINE,
+            'NAME': DB_NAME,
+            'USER': DB_USER,
+            'PASSWORD': DB_PASSWORD,
+            'HOST': DB_HOST,
+            'PORT': DB_PORT,
+            'OPTIONS': {
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'" if 'mysql' in DB_ENGINE else {},
+                'charset': 'utf8mb4' if 'mysql' in DB_ENGINE else None,
+            } if 'mysql' in DB_ENGINE else {},
+        }
+    }
+elif DATABASE_URL:
     # If DATABASE_URL is provided, use dj-database-url to parse it
     try:
         import dj_database_url
         DATABASES = {
             'default': dj_database_url.parse(DATABASE_URL)
         }
+        # Add MySQL options if it's a MySQL database
+        if 'mysql' in DATABASE_URL:
+            DATABASES['default']['OPTIONS'] = {
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+                'charset': 'utf8mb4',
+            }
     except ImportError:
         # Fallback to SQLite if dj-database-url is not available
         DATABASES = {

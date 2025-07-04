@@ -1,0 +1,390 @@
+// =============================================================================
+// MAIN STYLES - Portfolio Theme
+// =============================================================================
+
+@import "variables";
+@import "mixins";
+
+// =============================================================================
+// BASE STYLES
+// =============================================================================
+
+body {
+    color: $secondary-light;
+    background-color: $white;
+    font-family: $font-family-sans;
+    line-height: $line-height-relaxed;
+    font-size: $font-size-base;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: $font-weight-bold;
+    line-height: $line-height-tight;
+    margin-bottom: $spacing-4;
+}
+
+h1 { font-size: $font-size-4xl; }
+h2 { font-size: $font-size-3xl; }
+h3 { font-size: $font-size-2xl; }
+h4 { font-size: $font-size-xl; }
+h5 { font-size: $font-size-lg; }
+h6 { font-size: $font-size-base; }
+
+// =============================================================================
+// NAVIGATION
+// =============================================================================
+
+.navbar {
+    background-color: $dark-bg-light !important;
+    backdrop-filter: blur(10px);
+    box-shadow: $shadow-sm;
+    
+    .navbar-brand {
+        color: $white !important;
+        font-weight: $font-weight-bold;
+        font-size: $font-size-xl;
+        
+        i {
+            color: $primary-light;
+        }
+    }
+    
+    .nav-link {
+        color: $dark-text-muted !important;
+        font-weight: $font-weight-medium;
+        transition: all $transition-base;
+        position: relative;
+        
+        &:hover {
+            color: $primary-light !important;
+            transform: translateY(-1px);
+        }
+        
+        &.active {
+            color: $primary-light !important;
+            
+            &::after {
+                content: '';
+                position: absolute;
+                bottom: -8px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 6px;
+                height: 6px;
+                background-color: $primary-light;
+                border-radius: $border-radius-full;
+            }
+        }
+    }
+}
+
+// =============================================================================
+// BUTTONS
+// =============================================================================
+
+.btn-primary {
+    @include button-variant($primary-color, $primary-dark);
+    border-radius: $border-radius-lg;
+    padding: $spacing-3 $spacing-6;
+    font-weight: $font-weight-medium;
+}
+
+.btn-secondary {
+    @include button-variant($secondary-color, $secondary-dark);
+    border-radius: $border-radius-lg;
+    padding: $spacing-3 $spacing-6;
+    font-weight: $font-weight-medium;
+}
+
+.btn-accent {
+    @include button-variant($accent-color, $accent-dark);
+    border-radius: $border-radius-lg;
+    padding: $spacing-3 $spacing-6;
+    font-weight: $font-weight-medium;
+}
+
+.btn-outline-primary {
+    background-color: transparent;
+    color: $primary-color;
+    border: 2px solid $primary-color;
+    border-radius: $border-radius-lg;
+    padding: $spacing-3 $spacing-6;
+    font-weight: $font-weight-medium;
+    transition: all $transition-base;
+    
+    &:hover {
+        background-color: $primary-color;
+        color: $white;
+        transform: translateY(-1px);
+        box-shadow: $shadow-md;
+    }
+}
+
+// =============================================================================
+// CARDS & COMPONENTS
+// =============================================================================
+
+.card {
+    @include card-style();
+    border: none;
+    
+    .card-header {
+        background-color: $gray-50;
+        border-bottom: 1px solid $gray-200;
+        border-radius: $border-radius-lg $border-radius-lg 0 0;
+    }
+    
+    .card-body {
+        padding: $spacing-6;
+    }
+}
+
+.project-card {
+    @include card-style($shadow-sm, $shadow-xl);
+    border: none;
+    overflow: hidden;
+    
+    .card-img-top {
+        transition: transform $transition-base;
+        height: 200px;
+        object-fit: cover;
+    }
+    
+    &:hover .card-img-top {
+        transform: scale(1.05);
+    }
+    
+    .card-body {
+        padding: $spacing-5;
+    }
+    
+    .card-title {
+        font-size: $font-size-lg;
+        font-weight: $font-weight-semibold;
+        color: $gray-800;
+        margin-bottom: $spacing-3;
+    }
+    
+    .card-text {
+        color: $gray-600;
+        line-height: $line-height-relaxed;
+    }
+}
+
+.blog-card {
+    @include card-style();
+    
+    .blog-meta {
+        color: $gray-500;
+        font-size: $font-size-sm;
+        
+        .badge {
+            background-color: $primary-lighter;
+            color: $primary-dark;
+            border-radius: $border-radius-full;
+            padding: $spacing-1 $spacing-3;
+            font-size: $font-size-xs;
+            font-weight: $font-weight-medium;
+        }
+    }
+}
+
+// =============================================================================
+// HERO SECTIONS
+// =============================================================================
+
+.hero-section {
+    background: linear-gradient(135deg, $primary-color 0%, $primary-light 50%, $accent-color 100%);
+    color: $white;
+    padding: $spacing-24 0;
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23ffffff" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        pointer-events: none;
+    }
+    
+    .hero-title {
+        font-size: $font-size-5xl;
+        font-weight: $font-weight-extrabold;
+        margin-bottom: $spacing-6;
+        @include animate-fade-in-up(0.8s);
+        
+        @include media-md {
+            font-size: $font-size-4xl;
+        }
+    }
+    
+    .hero-subtitle {
+        font-size: $font-size-xl;
+        font-weight: $font-weight-light;
+        margin-bottom: $spacing-8;
+        opacity: 0.9;
+        @include animate-fade-in-up(0.8s, 0.2s);
+        
+        @include media-md {
+            font-size: $font-size-lg;
+        }
+    }
+    
+    .hero-cta {
+        @include animate-fade-in-up(0.8s, 0.4s);
+    }
+}
+
+// =============================================================================
+// FORMS
+// =============================================================================
+
+.form-control {
+    border: 2px solid $gray-200;
+    border-radius: $border-radius-lg;
+    padding: $spacing-3 $spacing-4;
+    font-size: $font-size-base;
+    transition: all $transition-base;
+    
+    &:focus {
+        @include focus-ring($primary-color);
+        border-color: $primary-color;
+    }
+}
+
+.form-label {
+    font-weight: $font-weight-medium;
+    color: $gray-700;
+    margin-bottom: $spacing-2;
+}
+
+// =============================================================================
+// ALERTS & MESSAGES
+// =============================================================================
+
+.alert {
+    border-radius: $border-radius-lg;
+    border: none;
+    padding: $spacing-4 $spacing-5;
+    
+    &.alert-success {
+        background-color: lighten($success-color, 45%);
+        color: darken($success-color, 20%);
+        border-left: 4px solid $success-color;
+    }
+    
+    &.alert-danger {
+        background-color: lighten($danger-color, 45%);
+        color: darken($danger-color, 20%);
+        border-left: 4px solid $danger-color;
+    }
+    
+    &.alert-warning {
+        background-color: lighten($warning-color, 45%);
+        color: darken($warning-color, 20%);
+        border-left: 4px solid $warning-color;
+    }
+    
+    &.alert-info {
+        background-color: lighten($info-color, 45%);
+        color: darken($info-color, 20%);
+        border-left: 4px solid $info-color;
+    }
+}
+
+// =============================================================================
+// FOOTER
+// =============================================================================
+
+.footer {
+    background-color: $dark-bg !important;
+    color: $dark-text;
+    
+    h5, h6 {
+        color: $white;
+    }
+    
+    a {
+        color: $dark-text-muted;
+        text-decoration: none;
+        transition: color $transition-base;
+        
+        &:hover {
+            color: $primary-light;
+        }
+    }
+    
+    .btn-outline-light {
+        border-color: $gray-600;
+        color: $gray-300;
+        
+        &:hover {
+            background-color: $primary-color;
+            border-color: $primary-color;
+            color: $white;
+        }
+    }
+}
+
+// =============================================================================
+// UTILITY CLASSES
+// =============================================================================
+
+.text-primary { color: $primary-color !important; }
+.text-secondary { color: $secondary-color !important; }
+.text-accent { color: $accent-color !important; }
+
+.bg-primary { background-color: $primary-color !important; }
+.bg-secondary { background-color: $secondary-color !important; }
+.bg-accent { background-color: $accent-color !important; }
+
+.shadow-custom { box-shadow: $shadow-lg; }
+.shadow-custom-xl { box-shadow: $shadow-xl; }
+
+.border-radius-lg { border-radius: $border-radius-lg; }
+.border-radius-xl { border-radius: $border-radius-xl; }
+
+// Animation utilities
+.fade-in-up {
+    @include animate-fade-in-up();
+}
+
+.fade-in-up-delay-1 {
+    @include animate-fade-in-up(0.6s, 0.1s);
+}
+
+.fade-in-up-delay-2 {
+    @include animate-fade-in-up(0.6s, 0.2s);
+}
+
+.fade-in-up-delay-3 {
+    @include animate-fade-in-up(0.6s, 0.3s);
+}
+
+// =============================================================================
+// RESPONSIVE DESIGN
+// =============================================================================
+
+@include media-sm {
+    .hero-section {
+        padding: $spacing-16 0;
+    }
+}
+
+@include media-md {
+    .project-card {
+        .card-img-top {
+            height: 250px;
+        }
+    }
+}
+
+@include media-lg {
+    .hero-section {
+        padding: $spacing-24 0;
+    }
+}
