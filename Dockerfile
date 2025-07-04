@@ -26,6 +26,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project
 COPY . .
 
+# Copy and set permissions for startup script
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
 # Collect static files
 RUN python manage.py collectstatic --noinput
 
@@ -35,7 +39,7 @@ RUN chown -R appuser:appuser /app
 USER appuser
 
 # Expose port
-EXPOSE $PORT
+EXPOSE 8000
 
-# Command to run the application
-CMD python manage.py migrate && gunicorn portfolio_project.wsgi:application --bind 0.0.0.0:$PORT
+# Use startup script
+CMD ["/app/start.sh"]

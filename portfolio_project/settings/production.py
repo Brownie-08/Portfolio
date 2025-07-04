@@ -13,14 +13,18 @@ import dj_database_url
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Allowed hosts for production - Railway and custom domains
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=Csv())
+# Allow all hosts for Railway deployment (Railway handles routing)
+ALLOWED_HOSTS = ['*']
 
-# Add Railway domain support
-if config('RAILWAY_ENVIRONMENT', default=None):
-    # Railway automatically provides these
-    railway_domain = config('RAILWAY_PUBLIC_DOMAIN', default=None)
-    if railway_domain and railway_domain not in ALLOWED_HOSTS:
-        ALLOWED_HOSTS.append(railway_domain)
+# Add specific Railway domain if provided
+railway_domain = config('RAILWAY_PUBLIC_DOMAIN', default=None)
+if railway_domain:
+    ALLOWED_HOSTS.append(railway_domain)
+
+# Add custom domains from environment
+custom_hosts = config('ALLOWED_HOSTS', default='', cast=Csv())
+if custom_hosts:
+    ALLOWED_HOSTS.extend(custom_hosts)
 
 # Database configuration for production
 DATABASE_URL = config('DATABASE_URL', default=None)

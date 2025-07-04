@@ -19,8 +19,15 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from portfolio.health import health_check, ready_check
 
 urlpatterns = [
+    # Health check endpoints for Railway
+    path('health/', health_check, name='health_check'),
+    path('ready/', ready_check, name='ready_check'),
+    path('healthz/', health_check, name='healthz'),  # Alternative endpoint
+    
+    # Main application URLs
     path('admin/', admin.site.urls),
     path('dashboard/', include('dashboard.urls')),
     path('', include('portfolio.urls')),
