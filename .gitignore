@@ -60,6 +60,7 @@ db.sqlite3-journal
 .env.local
 .env.production
 .env.staging
+.env.railway
 .venv
 env/
 venv/
@@ -67,6 +68,16 @@ fresh_venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Database backups and sensitive data
+*.json
+!railway.json
+!package.json
+!requirements.json
+backup_data.json
+portfolio_backup.json
+portfolio_data.json
+sqlite_backup*.json
 
 # Spyder project settings
 .spyderproject

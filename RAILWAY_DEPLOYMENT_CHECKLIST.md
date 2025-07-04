@@ -99,10 +99,10 @@ EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
-EMAIL_HOST_USER=udohpeterbrown@gmail.com
-EMAIL_HOST_PASSWORD=lfqm hxvz xlpe opwu
-DEFAULT_FROM_EMAIL=udohpeterbrown@gmail.com
-CONTACT_EMAIL=udohpeterbrown@gmail.com
+EMAIL_HOST_USER=your-email@gmail.com
+EMAIL_HOST_PASSWORD=your-16-character-app-password
+DEFAULT_FROM_EMAIL=your-email@gmail.com
+CONTACT_EMAIL=your-email@gmail.com
 SEND_AUTO_REPLY=True
 ADMIN_EMAIL_SUBJECT_PREFIX=[Portfolio Contact] 
 
