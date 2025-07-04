@@ -6,7 +6,8 @@ gunicorn==21.2.0
 Pillow==10.4.0
 dj-database-url==2.1.0
 
-# Database drivers
+# Database drivers (Python 3.13 compatible)
+psycopg[binary]==3.1.19
 psycopg2-binary==2.9.7
 mysqlclient==2.2.4
 
