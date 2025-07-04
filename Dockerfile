@@ -42,4 +42,4 @@ USER appuser
 EXPOSE 8000
 
 # Use startup script
-CMD ["/app/start.sh"]
+CMD ["/bin/bash", "/app/start.sh"]
