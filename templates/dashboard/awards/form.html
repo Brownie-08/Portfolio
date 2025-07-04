@@ -10,10 +10,7 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-body">
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form|crispy }}
-                </form>
+                {% crispy form %}
             </div>
         </div>
     </div>
