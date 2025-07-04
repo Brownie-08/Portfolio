@@ -27,43 +27,27 @@ if '*' not in ALLOWED_HOSTS:
 # Database configuration for production
 DATABASE_URL = config('DATABASE_URL', default=None)
 
-# Check for separate MySQL settings first
-DB_ENGINE = config('DB_ENGINE', default=None)
-DB_NAME = config('DB_NAME', default=None)
-DB_USER = config('DB_USER', default=None)
-DB_PASSWORD = config('DB_PASSWORD', default=None)
-DB_HOST = config('DB_HOST', default='localhost')
-DB_PORT = config('DB_PORT', default=3306, cast=int)
-
-if DB_ENGINE and DB_NAME:
-    # Use separate database settings
+if DATABASE_URL:
+    # Use DATABASE_URL for production (PostgreSQL preferred)
     DATABASES = {
-        'default': {
-            'ENGINE': DB_ENGINE,
-            'NAME': DB_NAME,
-            'USER': DB_USER,
-            'PASSWORD': DB_PASSWORD,
-            'HOST': DB_HOST,
-            'PORT': DB_PORT,
-            'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'" if 'mysql' in DB_ENGINE else {},
-                'charset': 'utf8mb4' if 'mysql' in DB_ENGINE else None,
-            } if 'mysql' in DB_ENGINE else {},
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+    }
+    
+    # Add PostgreSQL-specific options for better performance
+    if 'postgres' in DATABASE_URL or 'postgresql' in DATABASE_URL:
+        DATABASES['default']['OPTIONS'] = {
+            'sslmode': 'require',
         }
-    }
-elif DATABASE_URL:
-    # If DATABASE_URL is provided, use dj-database-url to parse it
-    DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL)
-    }
-    # Add MySQL options if it's a MySQL database
-    if 'mysql' in DATABASE_URL:
+        DATABASES['default']['CONN_MAX_AGE'] = 600
+        
+    # Add MySQL options if it's a MySQL database (fallback)
+    elif 'mysql' in DATABASE_URL:
         DATABASES['default']['OPTIONS'] = {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',
         }
 else:
-    # Fallback to SQLite for simple deployments
+    # Fallback to SQLite for local development only
     import os
     DATABASES = {
         'default': {
@@ -149,6 +133,11 @@ CACHES = {
 
 # Session configuration
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db' if config('REDIS_URL', default=None) else 'django.contrib.sessions.backends.db'
+
+# Enable compression for production
+COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = True
+COMPRESS_OFFLINE_TIMEOUT = 31536000  # 1 year
 
 # Disable debug toolbar in production
 if 'debug_toolbar' in INSTALLED_APPS:
