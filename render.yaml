@@ -16,7 +16,7 @@ services:
       - key: DJANGO_SETTINGS_MODULE
         value: portfolio_project.settings.production
       - key: PYTHON_VERSION
-        value: 3.11.4
+        value: 3.11.9
       - key: COMPRESS_ENABLED
         value: True
       - key: COMPRESS_OFFLINE
