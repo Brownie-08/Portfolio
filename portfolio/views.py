@@ -263,27 +263,45 @@ class ContactView(FormView):
             contact_email = getattr(settings, 'CONTACT_EMAIL', settings.DEFAULT_FROM_EMAIL)
             admin_subject_prefix = getattr(settings, 'ADMIN_EMAIL_SUBJECT_PREFIX', '[Portfolio Contact] ')
             
+            # Get personal info for professional signature
+            from .models import PersonalInfo
+            personal_info = PersonalInfo.get_active()
+            
             # Email to admin/owner
             admin_subject = f"{admin_subject_prefix}{contact_message.subject}"
             
+            # Professional email template
+            website_info = f"\n🌐 Website: {personal_info.website_url}" if personal_info and personal_info.website_url else ""
+            location_info = f"\n📍 Location: {personal_info.location}" if personal_info and personal_info.location else ""
+            
             admin_message = f"""
-New Contact Form Submission
-============================
+📧 NEW PORTFOLIO CONTACT SUBMISSION
+{'=' * 50}
 
-From: {contact_message.name}
+👤 CONTACT DETAILS:
+Name: {contact_message.name}
 Email: {contact_message.email}
 Subject: {contact_message.subject}
-Submitted: {contact_message.created.strftime('%Y-%m-%d %H:%M:%S')}
+Submitted: {contact_message.created.strftime('%B %d, %Y at %I:%M %p')}
 
-Message:
-{'-' * 40}
+💬 MESSAGE:
+{'-' * 50}
 {contact_message.message}
-{'-' * 40}
+{'-' * 50}
 
-You can reply directly to {contact_message.email}
+🔄 NEXT STEPS:
+• Reply directly to: {contact_message.email}
+• View in dashboard: http://127.0.0.1:8000/dashboard/messages/
+• Mark as read after responding
+
+{'=' * 50}
+🏷️ PORTFOLIO INFORMATION:
+Owner: {personal_info.full_name if personal_info else 'Portfolio Owner'}
+Portfolio: {personal_info.portfolio_name if personal_info else 'My Portfolio'}{website_info}{location_info}
 
 ---
-This message was sent from your portfolio website contact form.
+⚡ This notification was automatically generated from your portfolio contact form.
+📱 You can manage all messages from your dashboard.
             """
             
             # Send email to admin
@@ -309,27 +327,55 @@ This message was sent from your portfolio website contact form.
     def send_auto_reply(self, contact_message):
         """Send an automatic reply to the contact form sender"""
         try:
-            auto_reply_subject = "Thank you for contacting me!"
+            # Get personal info for professional signature
+            from .models import PersonalInfo
+            personal_info = PersonalInfo.get_active()
+            
+            # Professional auto-reply subject
+            portfolio_name = personal_info.portfolio_name if personal_info else "My Portfolio"
+            auto_reply_subject = f"Thank you for contacting {portfolio_name}!"
+            
+            # Professional auto-reply template
+            full_name = personal_info.full_name if personal_info else "Portfolio Owner"
+            current_role = f"\n{personal_info.current_role}" if personal_info and personal_info.current_role else ""
+            email_contact = f"\n📧 Email: {personal_info.email}" if personal_info and personal_info.email else ""
+            phone_contact = f"\n📞 Phone: {personal_info.phone}" if personal_info and personal_info.phone else ""
+            website_link = f"\n🌐 Portfolio: {personal_info.website_url}" if personal_info and personal_info.website_url else ""
+            linkedin_link = f"\n💼 LinkedIn: {personal_info.linkedin_url}" if personal_info and personal_info.linkedin_url else ""
             
             auto_reply_message = f"""
-Hi {contact_message.name},
+Hello {contact_message.name},
 
-Thank you for reaching out through my portfolio website! 
+✨ Thank you for reaching out through my portfolio website!
 
-I have received your message about "{contact_message.subject}" and will get back to you as soon as possible, typically within 24-48 hours.
+I have successfully received your message regarding "{contact_message.subject}" and truly appreciate you taking the time to contact me.
 
-Here's a copy of your message for your records:
-{'-' * 40}
+📋 MESSAGE CONFIRMATION:
+Your inquiry has been logged and I will respond personally within 24-48 hours. Here's a copy of your message for your records:
+
+{'-' * 50}
 {contact_message.message}
-{'-' * 40}
+{'-' * 50}
 
-If you have any urgent inquiries, please feel free to reach out to me directly.
+🚀 WHAT'S NEXT:
+• I'll review your message carefully
+• You'll receive a personalized response soon
+• Feel free to follow up if you have additional questions
+
+📞 FOR URGENT MATTERS:
+If you have time-sensitive inquiries, please don't hesitate to reach out directly using the contact information below.
+
+{'=' * 50}
+🏷️ CONTACT INFORMATION:
+{full_name}{current_role}{email_contact}{phone_contact}{website_link}{linkedin_link}
 
 Best regards,
-Your Portfolio Owner
+{full_name}
+{portfolio_name}
 
 ---
-This is an automated response. Please do not reply to this email.
+🤖 This is an automated confirmation. Please do not reply to this email.
+💬 I'll be in touch with you personally very soon!
             """
             
             send_mail(
