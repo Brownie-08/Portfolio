@@ -63,8 +63,14 @@ elif DATABASE_URL:
             'charset': 'utf8mb4',
         }
 else:
-    # Fallback configuration (should not be used in production)
-    raise ValueError("Database configuration missing in production environment")
+    # Fallback to SQLite for simple deployments
+    import os
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Email backend for production
 EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
