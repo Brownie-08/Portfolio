@@ -12,19 +12,17 @@ import dj_database_url
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-# Allowed hosts for production - Railway and custom domains
-# Allow all hosts for Railway deployment (Railway handles routing)
-ALLOWED_HOSTS = ['*']
+# Allowed hosts for production - Render and custom domains
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=Csv())
 
-# Add specific Railway domain if provided
-railway_domain = config('RAILWAY_PUBLIC_DOMAIN', default=None)
-if railway_domain:
-    ALLOWED_HOSTS.append(railway_domain)
+# Add Render domain if provided
+render_domain = config('RENDER_EXTERNAL_HOSTNAME', default=None)
+if render_domain:
+    ALLOWED_HOSTS.append(render_domain)
 
-# Add custom domains from environment
-custom_hosts = config('ALLOWED_HOSTS', default='', cast=Csv())
-if custom_hosts:
-    ALLOWED_HOSTS.extend(custom_hosts)
+# Ensure localhost and common domains are allowed
+if '*' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.extend(['localhost', '127.0.0.1', '.onrender.com'])
 
 # Database configuration for production
 DATABASE_URL = config('DATABASE_URL', default=None)
@@ -72,17 +70,17 @@ else:
 EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
 
 # Production-specific security settings
-# Disable SSL redirect for Railway (Railway handles SSL termination)
-SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)
+# Render.com SSL configuration
+SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=True, cast=bool)
 SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=31536000, cast=int)  # 1 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = config('SECURE_HSTS_INCLUDE_SUBDOMAINS', default=True, cast=bool)
 SECURE_HSTS_PRELOAD = config('SECURE_HSTS_PRELOAD', default=True, cast=bool)
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
-# Disable secure cookies for Railway (Railway handles SSL termination)
-SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=False, cast=bool)
-CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=False, cast=bool)
+# Secure cookies for Render (Render provides proper HTTPS)
+SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=True, cast=bool)
+CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=True, cast=bool)
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
 
