@@ -1,0 +1,62 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+fresh_venv/
+.venv
+.env
+.env.local
+.env.production
+.env.staging
+.env.railway
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+
+# Media files (will be handled separately in production)
+media/
+
+# Documentation
+README.md
+*.md
+!requirements.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Build files
+node_modules/
+npm-debug.log*
+
+# Backup files
+*.json
+!railway.json
+
+# Development tools
+.pytest_cache/
+.coverage
+htmlcov/

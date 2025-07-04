@@ -2,34 +2,70 @@
 
 ## 🚨 **Common Build Errors and Fixes**
 
-### **Issue: "plp: command not found" Error**
-**Error Message**: `/bin/bash: line 1: plp: command not found`
+### **Issue: Python pip Module Missing**
+**Error Messages**: 
+- `/bin/bash: line 1: plp: command not found`
+- `/root/.nix-profile/bin/python: No module named pip`
 
-**Root Cause**: Typo in build configuration where `plp` is used instead of `pip`
+**Root Cause**: nixpacks Python environment missing pip module
 
-**✅ Resolution Applied:**
-1. ✅ Updated `nixpacks.toml` with explicit `python -m pip` commands
-2. ✅ Enhanced `railway.json` with explicit build commands
-3. ✅ Added `runtime.txt` to specify Python version
-4. ✅ Created backup build script (`build.sh`)
+**✅ Final Resolution Applied:**
+1. ✅ Created custom Dockerfile with proper Python/pip setup
+2. ✅ Updated railway.json to use Docker instead of nixpacks
+3. ✅ Added .dockerignore for optimized builds
+4. ✅ Specified exact package versions in requirements.txt
+5. ✅ Comprehensive Docker-based deployment
 
 ---
 
 ## 🔧 **Updated Configuration Files**
 
-### **nixpacks.toml** (Primary Build Config)
-```toml
-[phases.setup]
-nixPkgs = ["python311", "pkg-config", "mysql80"]
+### **Dockerfile** (Current Solution)
+```dockerfile
+FROM python:3.11-slim
 
-[phases.install]
-cmds = [
-  "python -m pip install --upgrade pip",
-  "python -m pip install -r requirements.txt"
-]
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-[phases.build]
-cmds = ["python manage.py collectstatic --noinput"]
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    default-libmysqlclient-dev \
+    build-essential
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy project and collect static files
+COPY . .
+RUN python manage.py collectstatic --noinput
+
+# Run application
+CMD python manage.py migrate && gunicorn portfolio_project.wsgi:application --bind 0.0.0.0:$PORT
+```
+
+### **railway.json** (Docker Configuration)
+```json
+{
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile"
+  },
+  "deploy": {
+    "healthcheckPath": "/",
+    "restartPolicyType": "ON_FAILURE"
+  }
+}
+```
+
+### **Key Docker Advantages:**
+- ✅ Reliable Python/pip environment
+- ✅ Consistent builds across platforms
+- ✅ Full control over dependencies
+- ✅ No nixpacks environment issues
+- ✅ Proven deployment method
 
 [start]
 cmd = "python manage.py migrate && gunicorn portfolio_project.wsgi --bind 0.0.0.0:$PORT"
