@@ -1,0 +1,108 @@
+name: django-portfolio
+services:
+- name: web
+  source_dir: /
+  github:
+    repo: your-username/portfolio-repo
+    branch: feature/complete-portfolio
+    deploy_on_push: true
+  run_command: |
+    python manage.py collectstatic --noinput
+    python manage.py migrate
+    gunicorn --worker-tmp-dir /dev/shm --workers 2 --bind 0.0.0.0:8080 portfolio_project.wsgi:application
+  environment_slug: python
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 8080
+  routes:
+  - path: /
+    preserve_path_prefix: false
+  envs:
+  # Django Configuration
+  - key: DJANGO_SETTINGS_MODULE
+    value: portfolio_project.settings.production
+  - key: SECRET_KEY
+    value: your-super-secret-production-key-here-replace-this
+    type: SECRET
+  - key: DEBUG
+    value: "False"
+  - key: ALLOWED_HOSTS
+    value: your-domain.com,your-app.ondigitalocean.app
+    
+  # Database Configuration (DigitalOcean Managed MySQL)
+  - key: DB_ENGINE
+    value: django.db.backends.mysql
+  - key: DB_NAME
+    value: portfolio_db
+  - key: DB_USER
+    value: doadmin
+  - key: DB_PASSWORD
+    value: your-database-password-from-digitalocean
+    type: SECRET
+  - key: DB_HOST
+    value: your-database-host.db.ondigitalocean.com
+  - key: DB_PORT
+    value: "25060"
+    
+  # Email Configuration (Gmail SMTP)
+  - key: EMAIL_BACKEND
+    value: django.core.mail.backends.smtp.EmailBackend
+  - key: EMAIL_HOST
+    value: smtp.gmail.com
+  - key: EMAIL_PORT
+    value: "587"
+  - key: EMAIL_USE_TLS
+    value: "True"
+  - key: EMAIL_HOST_USER
+    value: your-email@gmail.com
+  - key: EMAIL_HOST_PASSWORD
+    value: your-gmail-app-password
+    type: SECRET
+  - key: DEFAULT_FROM_EMAIL
+    value: your-email@gmail.com
+    
+  # Contact Form Settings
+  - key: CONTACT_EMAIL
+    value: your-email@gmail.com
+  - key: SEND_AUTO_REPLY
+    value: "True"
+  - key: ADMIN_EMAIL_SUBJECT_PREFIX
+    value: "[Portfolio Contact] "
+    
+  # Security Settings
+  - key: SECURE_SSL_REDIRECT
+    value: "True"
+  - key: SECURE_HSTS_SECONDS
+    value: "31536000"
+  - key: SECURE_HSTS_INCLUDE_SUBDOMAINS
+    value: "True"
+  - key: SECURE_HSTS_PRELOAD
+    value: "True"
+  - key: SESSION_COOKIE_SECURE
+    value: "True"
+  - key: CSRF_COOKIE_SECURE
+    value: "True"
+    
+  # Optional: DigitalOcean Spaces for file storage
+  # Uncomment if you want to use Spaces for media files
+  # - key: USE_S3
+  #   value: "True"
+  # - key: AWS_ACCESS_KEY_ID
+  #   value: your-spaces-access-key
+  #   type: SECRET
+  # - key: AWS_SECRET_ACCESS_KEY
+  #   value: your-spaces-secret-key
+  #   type: SECRET
+  # - key: AWS_STORAGE_BUCKET_NAME
+  #   value: your-portfolio-media
+  # - key: AWS_S3_ENDPOINT_URL
+  #   value: https://nyc3.digitaloceanspaces.com
+  # - key: AWS_S3_CUSTOM_DOMAIN
+  #   value: your-cdn-domain.com
+
+# Optional: Add a static site for serving static files
+# static_sites:
+# - name: static
+#   source_dir: staticfiles
+#   routes:
+#   - path: /static
