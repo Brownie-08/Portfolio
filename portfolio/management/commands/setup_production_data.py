@@ -18,7 +18,7 @@ class Command(BaseCommand):
             defaults={
                 'portfolio_name': 'Peter Emmanuel\'s Portfolio',
                 'full_name': 'Peter Emmanuel',
-                'email': 'udohpeterbrown@gmail.com',
+                'email': 'emmanuelmikebrown242@yahoo.com',
                 'phone': '+2347033558942',
                 'bio': 'Passionate full-stack developer with 3+ years of experience creating innovative web solutions using Django, React, and modern technologies.',
                 'location': 'Nigeria',
