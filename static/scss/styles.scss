@@ -302,30 +302,87 @@ h6 { font-size: $font-size-base; }
 
 .footer {
     background-color: $dark-bg !important;
-    color: $dark-text;
+    color: $white;
     
     h5, h6 {
-        color: $white;
+        color: $white !important;
     }
     
+    // Footer links styling
+    .footer-link {
+        color: rgba(255, 255, 255, 0.8) !important;
+        text-decoration: none !important;
+        transition: all $transition-base;
+        position: relative;
+        
+        &:hover {
+            color: $primary-light !important;
+            transform: translateX(4px);
+        }
+        
+        &:focus {
+            color: $primary-light !important;
+            outline: none;
+        }
+    }
+    
+    // Regular footer links fallback
     a {
-        color: $dark-text-muted;
+        color: rgba(255, 255, 255, 0.8);
         text-decoration: none;
-        transition: color $transition-base;
+        transition: all $transition-base;
         
         &:hover {
             color: $primary-light;
         }
+        
+        &:focus {
+            color: $primary-light;
+            outline: none;
+        }
     }
     
+    // Social media buttons
     .btn-outline-light {
-        border-color: $gray-600;
-        color: $gray-300;
+        border-color: rgba(255, 255, 255, 0.3);
+        color: rgba(255, 255, 255, 0.9);
+        transition: all $transition-base;
         
         &:hover {
             background-color: $primary-color;
             border-color: $primary-color;
             color: $white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        &:focus {
+            background-color: $primary-color;
+            border-color: $primary-color;
+            color: $white;
+            box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.25);
+        }
+    }
+    
+    // Icons in footer
+    .text-primary {
+        color: $primary-light !important;
+    }
+    
+    // Footer sections spacing
+    .col-lg-4,
+    .col-lg-3,
+    .col-lg-2 {
+        @include media-md {
+            margin-bottom: $spacing-6;
+        }
+    }
+    
+    // Responsive improvements
+    @include media-sm {
+        .container {
+            padding-left: $spacing-4;
+            padding-right: $spacing-4;
         }
     }
 }

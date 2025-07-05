@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import media_views
 
 app_name = 'portfolio'
 
@@ -20,4 +21,9 @@ urlpatterns = [
     
     # Contact page
     path('contact/', views.ContactView.as_view(), name='contact'),
+    
+    # Media serving URLs (fallback for production)
+    path('media-serve/<path:path>', media_views.serve_media, name='serve_media'),
+    path('profile-image/', media_views.serve_profile_image, name='serve_profile_image'),
+    path('resume-download/', media_views.serve_resume, name='serve_resume'),
 ]

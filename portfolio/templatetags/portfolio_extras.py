@@ -1,4 +1,6 @@
 from django import template
+from django.urls import reverse
+from django.conf import settings
 
 register = template.Library()
 
@@ -70,3 +72,53 @@ def mul(value, arg):
         return float(value) * float(arg)
     except (ValueError, TypeError):
         return 0
+
+@register.filter
+def media_url_fallback(file_field):
+    """
+    Generate a fallback media URL for production environments.
+    If the direct media URL doesn't work, use the fallback view.
+    
+    Usage: {{ personal_info.profile_image|media_url_fallback }}
+    """
+    if not file_field:
+        return ''
+    
+    try:
+        # Try to get the direct media URL
+        return file_field.url
+    except (ValueError, AttributeError):
+        # If direct URL fails, use the fallback view
+        if hasattr(file_field, 'name') and file_field.name:
+            return reverse('portfolio:serve_media', kwargs={'path': file_field.name})
+        return ''
+
+@register.simple_tag
+def profile_image_url(personal_info):
+    """
+    Get the profile image URL with production fallback.
+    
+    Usage: {% profile_image_url personal_info %}
+    """
+    if not personal_info or not personal_info.profile_image:
+        return ''
+    
+    try:
+        return personal_info.profile_image.url
+    except (ValueError, AttributeError):
+        return reverse('portfolio:serve_profile_image')
+
+@register.simple_tag
+def resume_download_url(personal_info):
+    """
+    Get the resume download URL with production fallback.
+    
+    Usage: {% resume_download_url personal_info %}
+    """
+    if not personal_info or not personal_info.resume:
+        return ''
+    
+    try:
+        return personal_info.resume.url
+    except (ValueError, AttributeError):
+        return reverse('portfolio:serve_resume')

@@ -146,6 +146,10 @@ if 'debug_toolbar' in INSTALLED_APPS:
 # Remove debug middleware
 MIDDLEWARE = [middleware for middleware in MIDDLEWARE if 'debug_toolbar' not in middleware]
 
+# Media file serving in production
+# Note: Media files are served via WhiteNoise in WSGI for Render compatibility
+# For high-traffic production, consider using cloud storage (AWS S3, Cloudinary, etc.)
+
 # File storage (for DigitalOcean Spaces or AWS S3)
 USE_S3 = config('USE_S3', default=False, cast=bool)
 

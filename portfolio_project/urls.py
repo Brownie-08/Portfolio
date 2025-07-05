@@ -33,12 +33,15 @@ urlpatterns = [
     path('', include('portfolio.urls')),
 ]
 
-# Serve static and media files in development
+# Serve media files in both development and production
+# Note: For production, consider using cloud storage (AWS S3, etc.) for better performance
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Serve static files in development only
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     
-    # Debug Toolbar URLs
+    # Debug Toolbar URLs (development only)
     try:
         import debug_toolbar
         urlpatterns = [path('__debug__/', include(debug_toolbar.urls))] + urlpatterns

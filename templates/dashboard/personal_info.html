@@ -1,5 +1,6 @@
 {% extends 'dashboard/base.html' %}
 {% load crispy_forms_tags %}
+{% load portfolio_extras %}
 
 {% block title %}Personal Information{% endblock %}
 
@@ -59,7 +60,8 @@
                 <h5 class="mb-0"><i class="bi bi-image me-2"></i>Current Profile Image</h5>
             </div>
             <div class="card-body text-center">
-                <img src="{{ object.profile_image.url }}" alt="Profile Image" class="img-fluid rounded" style="max-width: 200px;">
+                {% profile_image_url object as profile_url %}
+                <img src="{{ profile_url }}" alt="Profile Image" class="img-fluid rounded" style="max-width: 200px;">
             </div>
         </div>
         {% endif %}
@@ -74,7 +76,8 @@
                     <strong>File:</strong> {{ object.resume.name|default:"No file uploaded" }}
                 </p>
                 {% if object.resume %}
-                    <a href="{{ object.resume.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                    {% resume_download_url object as resume_url %}
+                    <a href="{{ resume_url }}" class="btn btn-sm btn-outline-primary" target="_blank">
                         <i class="bi bi-download me-1"></i>Download Current CV
                     </a>
                 {% endif %}

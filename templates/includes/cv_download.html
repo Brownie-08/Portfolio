@@ -1,3 +1,4 @@
+{% load portfolio_extras %}
 {% comment %}
 Universal CV Download Button Component
 -------------------------------------
@@ -33,9 +34,10 @@ Examples:
 {% endcomment %}
 
 {% if personal_info.resume %}
+    {% resume_download_url personal_info as resume_url %}
     {% if button_context == "navbar" %}
         <li class="nav-item">
-            <a class="{{ button_class|default:'nav-link' }}" href="{{ personal_info.resume.url }}" target="{{ target|default:'_blank' }}">
+            <a class="{{ button_class|default:'nav-link' }}" href="{{ resume_url }}" target="{{ target|default:'_blank' }}">
                 {% if show_icon and icon_class %}
                     <i class="{{ icon_class|default:'bi bi-download' }} me-1"></i>
                 {% endif %}
@@ -43,14 +45,14 @@ Examples:
             </a>
         </li>
     {% elif button_context == "footer" %}
-        <a href="{{ personal_info.resume.url }}" class="{{ button_class|default:'btn btn-outline-light btn-sm' }}" target="{{ target|default:'_blank' }}">
+        <a href="{{ resume_url }}" class="{{ button_class|default:'btn btn-outline-light btn-sm' }}" target="{{ target|default:'_blank' }}">
             {% if show_icon|default:True %}
                 <i class="{{ icon_class|default:'bi bi-download' }} me-1"></i>
             {% endif %}
             {{ button_text|default:"Download CV" }}
         </a>
     {% elif button_context == "cta" %}
-        <a href="{{ personal_info.resume.url }}" class="{{ button_class|default:'btn btn-primary btn-lg' }}" target="{{ target|default:'_blank' }}">
+        <a href="{{ resume_url }}" class="{{ button_class|default:'btn btn-primary btn-lg' }}" target="{{ target|default:'_blank' }}">
             {% if show_icon|default:True %}
                 <i class="{{ icon_class|default:'bi bi-download' }} me-1"></i>
             {% endif %}
@@ -58,7 +60,7 @@ Examples:
         </a>
     {% else %}
         {% comment %}Default page context{% endcomment %}
-        <a href="{{ personal_info.resume.url }}" class="{{ button_class|default:'btn btn-primary' }}" target="{{ target|default:'_blank' }}">
+        <a href="{{ resume_url }}" class="{{ button_class|default:'btn btn-primary' }}" target="{{ target|default:'_blank' }}">
             {% if show_icon|default:True %}
                 <i class="{{ icon_class|default:'bi bi-download' }} me-1"></i>
             {% endif %}
