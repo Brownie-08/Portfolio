@@ -181,8 +181,7 @@ class BlogListView(ListView):
             is_published=True, is_featured=True
         ).first()
         
-        # Get all posts for context
-        context['posts'] = self.get_queryset()
+        # Note: blog_posts context is already provided by ListView
         
         # Pass current filters
         context['current_search'] = self.request.GET.get('search', '')
