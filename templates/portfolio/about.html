@@ -254,7 +254,15 @@
             <div class="col-lg-4 col-md-6">
                 <div class="card h-100 border-0 shadow-sm">
                     {% if cert.certificate_image %}
-                        <img src="{{ cert.certificate_image|media_url_fallback }}" class="card-img-top" alt="{{ cert.name }}" style="height: 200px; object-fit: cover;">
+                        <img src="{{ cert.certificate_image|media_url_fallback }}" class="card-img-top" alt="{{ cert.name }}" style="height: 200px; object-fit: cover;" 
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="d-none card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="bi bi-award text-muted" style="font-size: 3rem;"></i>
+                        </div>
+                    {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="bi bi-award text-muted" style="font-size: 3rem;"></i>
+                        </div>
                     {% endif %}
                     <div class="card-body">
                         <div class="d-flex align-items-start mb-3">
@@ -302,7 +310,15 @@
             <div class="col-lg-4 col-md-6">
                 <div class="card h-100 border-0 shadow-sm">
                     {% if award.award_image %}
-                        <img src="{{ award.award_image|media_url_fallback }}" class="card-img-top" alt="{{ award.title }}" style="height: 200px; object-fit: cover;">
+                        <img src="{{ award.award_image|media_url_fallback }}" class="card-img-top" alt="{{ award.title }}" style="height: 200px; object-fit: cover;" 
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="d-none card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="bi bi-trophy text-muted" style="font-size: 3rem;"></i>
+                        </div>
+                    {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="bi bi-trophy text-muted" style="font-size: 3rem;"></i>
+                        </div>
                     {% endif %}
                     <div class="card-body">
                         <div class="d-flex align-items-start mb-3">
