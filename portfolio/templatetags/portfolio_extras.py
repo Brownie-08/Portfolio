@@ -101,12 +101,24 @@ def profile_image_url(personal_info):
     Usage: {% profile_image_url personal_info %}
     """
     if not personal_info or not personal_info.profile_image:
-        return ''
+        return None
     
     try:
-        return personal_info.profile_image.url
-    except (ValueError, AttributeError):
-        return reverse('portfolio:serve_profile_image')
+        # Try to get the direct media URL first
+        url = personal_info.profile_image.url
+        # Ensure the URL is properly formatted
+        if url and not url.startswith('http'):
+            from django.conf import settings
+            if hasattr(settings, 'MEDIA_URL'):
+                if not url.startswith(settings.MEDIA_URL):
+                    url = settings.MEDIA_URL + url.lstrip('/')
+        return url
+    except (ValueError, AttributeError, Exception):
+        # Fallback to the serve view
+        try:
+            return reverse('portfolio:serve_profile_image')
+        except:
+            return None
 
 @register.simple_tag
 def resume_download_url(personal_info):
@@ -122,3 +134,26 @@ def resume_download_url(personal_info):
         return personal_info.resume.url
     except (ValueError, AttributeError):
         return reverse('portfolio:serve_resume')
+
+@register.filter
+def file_exists(file_field):
+    """
+    Check if a file field's file actually exists.
+    
+    Usage: {{ personal_info.profile_image|file_exists }}
+    """
+    if not file_field:
+        return False
+    
+    try:
+        import os
+        from django.conf import settings
+        
+        if hasattr(file_field, 'path'):
+            return os.path.exists(file_field.path)
+        elif hasattr(file_field, 'name') and file_field.name:
+            file_path = os.path.join(settings.MEDIA_ROOT, file_field.name)
+            return os.path.exists(file_path)
+        return False
+    except (ValueError, AttributeError, OSError):
+        return False

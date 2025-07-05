@@ -15,8 +15,15 @@
                     <!-- Profile Image -->
                     {% if personal_info.profile_image %}
                         {% profile_image_url personal_info as profile_url %}
-                        <img src="{{ profile_url }}" alt="{{ personal_info.full_name }}" 
-                             class="rounded-circle mx-auto d-block" style="width: 250px; height: 250px; object-fit: cover;">
+                        {% if profile_url %}
+                            <img src="{{ profile_url }}" alt="{{ personal_info.full_name }}" 
+                                 class="rounded-circle mx-auto d-block" style="width: 250px; height: 250px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-primary rounded-circle mx-auto d-flex align-items-center justify-content-center" 
+                                 style="width: 250px; height: 250px;">
+                                <i class="bi bi-person text-white" style="font-size: 8rem;"></i>
+                            </div>
+                        {% endif %}
                     {% else %}
                         <div class="bg-primary rounded-circle mx-auto d-flex align-items-center justify-content-center" 
                              style="width: 250px; height: 250px;">

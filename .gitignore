@@ -104,8 +104,15 @@ dmypy.json
 staticfiles/
 static_root/
 
-# Media files
+# Media files (ignore uploads but allow essential files for production)
 media/
+# But allow essential production files
+!media/README.md
+!media/images/
+!media/images/profile/
+!media/images/profile/new.jpg
+!media/files/
+!media/files/PETER-E.-UDOH-Developer....pdf
 
 # IDE
 .vscode/
