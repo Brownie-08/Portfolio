@@ -19,7 +19,7 @@ class Command(BaseCommand):
                 'portfolio_name': 'Peter Emmanuel\'s Portfolio',
                 'full_name': 'Peter Emmanuel',
                 'email': 'emmanuelmikebrown242@yahoo.com',
-                'phone': '+2347033558942',
+                'phone': '+2349123721167',
                 'bio': 'Passionate full-stack developer creating innovative solutions with modern technologies.',
                 'location': 'Nigeria',
                 'about_intro': 'Welcome to my digital portfolio! I\'m a dedicated developer with a passion for creating robust web applications.',
