@@ -150,10 +150,43 @@ MIDDLEWARE = [middleware for middleware in MIDDLEWARE if 'debug_toolbar' not in 
 # Note: Media files are served via WhiteNoise in WSGI for Render compatibility
 # For high-traffic production, consider using cloud storage (AWS S3, Cloudinary, etc.)
 
-# File storage (for DigitalOcean Spaces or AWS S3)
+# File storage configuration
+USE_CLOUDINARY = config('USE_CLOUDINARY', default=True, cast=bool)
 USE_S3 = config('USE_S3', default=False, cast=bool)
 
-if USE_S3:
+if USE_CLOUDINARY:
+    # Cloudinary configuration (recommended for Render)
+    import cloudinary
+    import cloudinary.uploader
+    import cloudinary.api
+    
+    # Add cloudinary_storage to INSTALLED_APPS if not already there
+    if 'cloudinary_storage' not in INSTALLED_APPS:
+        INSTALLED_APPS = ['cloudinary_storage'] + INSTALLED_APPS
+    if 'cloudinary' not in INSTALLED_APPS:
+        INSTALLED_APPS.append('cloudinary')
+    
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
+        'API_KEY': config('CLOUDINARY_API_KEY'),
+        'API_SECRET': config('CLOUDINARY_API_SECRET'),
+    }
+    
+    # Configure Cloudinary
+    cloudinary.config(
+        cloud_name=config('CLOUDINARY_CLOUD_NAME'),
+        api_key=config('CLOUDINARY_API_KEY'),
+        api_secret=config('CLOUDINARY_API_SECRET'),
+        secure=True
+    )
+    
+    # Use Cloudinary for media files
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    
+    # Media URL will be handled by Cloudinary
+    MEDIA_URL = '/media/'
+    
+elif USE_S3:
     # AWS S3 or DigitalOcean Spaces configuration
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     STATICFILES_STORAGE = 'storages.backends.s3boto3.StaticS3Boto3Storage'
