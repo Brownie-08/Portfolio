@@ -134,11 +134,10 @@ CACHES = {
 # Session configuration
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db' if config('REDIS_URL', default=None) else 'django.contrib.sessions.backends.db'
 
-# Temporarily disable compression to ensure deployment succeeds
-# Can be re-enabled later once SCSS compilation is working properly
-COMPRESS_ENABLED = False  # Temporarily disabled
-COMPRESS_OFFLINE = False  # Disable to avoid static file issues
-COMPRESS_OFFLINE_TIMEOUT = 31536000  # 1 year
+# Compression completely disabled for deployment stability
+# COMPRESS_ENABLED = False  # Completely removed
+# COMPRESS_OFFLINE = False  # Completely removed
+# COMPRESS_OFFLINE_TIMEOUT = 31536000  # Completely removed
 
 # Override STATICFILES_STORAGE for production to avoid manifest issues
 # Use the most basic WhiteNoise storage to avoid any compression conflicts
