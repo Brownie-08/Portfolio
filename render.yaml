@@ -5,9 +5,14 @@ services:
     plan: free
     buildCommand: |
       pip install -r requirements.txt
-      python manage.py collectstatic --noinput --clear
+      echo "Current directory: $(pwd)"
+      echo "Files in static directory:"
+      ls -la static/ || echo "No static directory found"
+      echo "Django settings module: $DJANGO_SETTINGS_MODULE"
+      python manage.py collectstatic --noinput --clear --verbosity=2
+      echo "Collectstatic completed"
       python manage.py migrate
-      python manage.py setup_production_data
+      echo "Migration completed"
     startCommand: gunicorn portfolio_project.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
       - key: DEBUG
@@ -17,7 +22,9 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: COMPRESS_ENABLED
-        value: True
+        value: False
+      - key: COMPRESS_OFFLINE
+        value: False
 
 databases:
   - name: portfolio-db
