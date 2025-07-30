@@ -6,7 +6,6 @@ services:
     buildCommand: |
       pip install -r requirements.txt
       python manage.py collectstatic --noinput
-      python manage.py compress --force
       python manage.py migrate
       python manage.py setup_production_data
     startCommand: gunicorn portfolio_project.wsgi:application --bind 0.0.0.0:$PORT
@@ -18,8 +17,6 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: COMPRESS_ENABLED
-        value: True
-      - key: COMPRESS_OFFLINE
         value: True
 
 databases:

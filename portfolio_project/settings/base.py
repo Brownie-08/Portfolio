@@ -94,8 +94,8 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-# WhiteNoise configuration for static files
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# WhiteNoise configuration for static files - Fix for missing admin files
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # Static files finders
 STATICFILES_FINDERS = [

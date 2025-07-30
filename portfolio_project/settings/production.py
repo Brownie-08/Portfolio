@@ -134,10 +134,13 @@ CACHES = {
 # Session configuration
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db' if config('REDIS_URL', default=None) else 'django.contrib.sessions.backends.db'
 
-# Enable compression for production
+# Enable compression for production - but disable offline compression to avoid issues
 COMPRESS_ENABLED = True
-COMPRESS_OFFLINE = True
+COMPRESS_OFFLINE = False  # Disable to avoid static file issues
 COMPRESS_OFFLINE_TIMEOUT = 31536000  # 1 year
+
+# Override STATICFILES_STORAGE for production to avoid manifest issues
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # Disable debug toolbar in production
 if 'debug_toolbar' in INSTALLED_APPS:
