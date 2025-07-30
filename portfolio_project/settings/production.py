@@ -141,13 +141,16 @@ COMPRESS_OFFLINE = False  # Disable to avoid static file issues
 COMPRESS_OFFLINE_TIMEOUT = 31536000  # 1 year
 
 # Override STATICFILES_STORAGE for production to avoid manifest issues
-# Use basic CompressedStaticFilesStorage to avoid admin file issues
-# ManifestStaticFilesStorage can cause issues with Django admin files
-STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+# Use the most basic WhiteNoise storage to avoid any compression conflicts
+STATICFILES_STORAGE = "whitenoise.storage.StaticFilesStorage"
 
 # Disable debug toolbar in production
 if 'debug_toolbar' in INSTALLED_APPS:
     INSTALLED_APPS.remove('debug_toolbar')
+
+# Temporarily remove compressor to avoid conflicts
+if 'compressor' in INSTALLED_APPS:
+    INSTALLED_APPS.remove('compressor')
 
 # Remove debug middleware
 MIDDLEWARE = [middleware for middleware in MIDDLEWARE if 'debug_toolbar' not in middleware]

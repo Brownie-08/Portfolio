@@ -95,8 +95,8 @@ STATICFILES_DIRS = [
 ]
 
 # WhiteNoise configuration for static files - Fix for missing admin files
-# Use CompressedStaticFilesStorage to avoid admin file issues
-STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+# Use the most basic WhiteNoise storage to avoid any compression issues
+STATICFILES_STORAGE = "whitenoise.storage.StaticFilesStorage"
 
 # Static files finders
 STATICFILES_FINDERS = [
