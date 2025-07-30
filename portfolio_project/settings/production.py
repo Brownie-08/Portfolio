@@ -140,12 +140,9 @@ COMPRESS_OFFLINE = False  # Disable to avoid static file issues
 COMPRESS_OFFLINE_TIMEOUT = 31536000  # 1 year
 
 # Override STATICFILES_STORAGE for production to avoid manifest issues
-# Use CompressedManifestStaticFilesStorage instead for better compatibility
-# Fallback to basic WhiteNoise storage if manifest causes issues
-if config('USE_MANIFEST_STORAGE', default=True, cast=bool):
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-else:
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+# Use basic CompressedStaticFilesStorage to avoid admin file issues
+# ManifestStaticFilesStorage can cause issues with Django admin files
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # Disable debug toolbar in production
 if 'debug_toolbar' in INSTALLED_APPS:
