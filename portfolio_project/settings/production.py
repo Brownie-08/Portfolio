@@ -134,10 +134,6 @@ CACHES = {
 # Session configuration
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db' if config('REDIS_URL', default=None) else 'django.contrib.sessions.backends.db'
 
-# Compression completely disabled for deployment stability
-# COMPRESS_ENABLED = False  # Completely removed
-# COMPRESS_OFFLINE = False  # Completely removed
-# COMPRESS_OFFLINE_TIMEOUT = 31536000  # Completely removed
 
 # Override STATICFILES_STORAGE for production to avoid manifest issues
 # Use the most basic WhiteNoise storage to avoid any compression conflicts
@@ -147,9 +143,6 @@ STATICFILES_STORAGE = "whitenoise.storage.StaticFilesStorage"
 if 'debug_toolbar' in INSTALLED_APPS:
     INSTALLED_APPS.remove('debug_toolbar')
 
-# Temporarily remove compressor to avoid conflicts
-if 'compressor' in INSTALLED_APPS:
-    INSTALLED_APPS.remove('compressor')
 
 # Remove debug middleware
 MIDDLEWARE = [middleware for middleware in MIDDLEWARE if 'debug_toolbar' not in middleware]

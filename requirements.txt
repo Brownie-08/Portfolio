@@ -17,9 +17,6 @@ crispy-bootstrap5==2024.2
 
 # Development tools
 django-debug-toolbar==4.2.0
-django-compressor==4.5.1
-django-libsass==0.9
-libsass==0.23.0
 
 # Security and utilities
 django-cors-headers==4.3.1

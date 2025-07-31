@@ -21,10 +21,6 @@ services:
         value: portfolio_project.settings.production
       - key: PYTHON_VERSION
         value: 3.11.9
-      - key: COMPRESS_ENABLED
-        value: False
-      - key: COMPRESS_OFFLINE
-        value: False
 
 databases:
   - name: portfolio-db

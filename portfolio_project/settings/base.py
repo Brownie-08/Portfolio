@@ -23,7 +23,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sitemaps",
-    # "compressor",  # Temporarily removed for deployment
     "crispy_forms",
     "crispy_bootstrap5",
     "portfolio",
@@ -102,25 +101,8 @@ STATICFILES_STORAGE = "whitenoise.storage.StaticFilesStorage"
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    # 'compressor.finders.CompressorFinder',  # Temporarily removed
 ]
 
-# Django Compressor settings - TEMPORARILY DISABLED
-# COMPRESS_ENABLED = config('COMPRESS_ENABLED', default=True, cast=bool)
-# COMPRESS_OFFLINE = config('COMPRESS_OFFLINE', default=False, cast=bool)
-# COMPRESS_ROOT = STATIC_ROOT
-# COMPRESS_URL = STATIC_URL
-# COMPRESS_STORAGE = 'compressor.storage.GzipCompressorFileStorage'
-# COMPRESS_CSS_FILTERS = [
-#     'compressor.filters.css_default.CssAbsoluteFilter',
-#     'compressor.filters.cssmin.rCSSMinFilter',
-# ]
-# COMPRESS_JS_FILTERS = [
-#     'compressor.filters.jsmin.rJSMinFilter',
-# ]
-# COMPRESS_PRECOMPILERS = (
-#     ('text/x-scss', 'django_libsass.SassCompiler'),
-# )
 
 # Media files
 MEDIA_URL = "/media/"
