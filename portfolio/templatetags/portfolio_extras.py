@@ -92,20 +92,15 @@ def media_url_fallback(file_field):
         # Get the URL from the file field
         url = file_field.url
         
-        # Debug: Print URL to console (remove in production)
-        print(f"Debug - File URL: {url}")
-        
         # Return the URL as-is since Cloudinary handles URL generation
         return url
         
     except (ValueError, AttributeError, Exception) as e:
-        print(f"Error getting media URL: {e}")
         # If direct URL fails, try the fallback view
         try:
             if hasattr(file_field, 'name') and file_field.name:
                 return reverse('portfolio:serve_media', kwargs={'path': file_field.name})
         except Exception as fallback_error:
-            print(f"Fallback URL generation failed: {fallback_error}")
             pass
         return ''
 

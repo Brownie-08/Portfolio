@@ -9,6 +9,8 @@ services:
       echo "Files in static directory:"
       ls -la static/ || echo "No static directory found"
       echo "Django settings module: $DJANGO_SETTINGS_MODULE"
+      echo "Testing Cloudinary configuration:"
+      python manage.py test_cloudinary
       python manage.py collectstatic --noinput --clear --verbosity=2
       echo "Collectstatic completed"
       python manage.py migrate
@@ -24,11 +26,11 @@ services:
       - key: USE_CLOUDINARY
         value: True
       - key: CLOUDINARY_CLOUD_NAME
-        sync: false  # Set this in Render dashboard
+        value: de9i7id2b
       - key: CLOUDINARY_API_KEY
-        sync: false  # Set this in Render dashboard  
+        value: 547248818221456
       - key: CLOUDINARY_API_SECRET
-        sync: false  # Set this in Render dashboard
+        value: 611drBROvgh5Bkip4HZYaLRoddI
       - key: SECRET_KEY
         generateValue: true
       - key: ALLOWED_HOSTS
