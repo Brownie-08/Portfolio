@@ -155,37 +155,78 @@ MIDDLEWARE = [middleware for middleware in MIDDLEWARE if 'debug_toolbar' not in 
 USE_CLOUDINARY = config('USE_CLOUDINARY', default=True, cast=bool)
 USE_S3 = config('USE_S3', default=False, cast=bool)
 
-if USE_CLOUDINARY:
-    # Cloudinary configuration (recommended for Render)
-    import cloudinary
-    import cloudinary.uploader
-    import cloudinary.api
+# Check if Cloudinary credentials are available
+CLOUDINARY_CLOUD_NAME = config('CLOUDINARY_CLOUD_NAME', default=None)
+CLOUDINARY_API_KEY = config('CLOUDINARY_API_KEY', default=None)
+CLOUDINARY_API_SECRET = config('CLOUDINARY_API_SECRET', default=None)
+
+# Only use Cloudinary if all credentials are provided
+if USE_CLOUDINARY and all([CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET]):
+    try:
+        # Cloudinary configuration (recommended for Render)
+        import cloudinary
+        import cloudinary.uploader
+        import cloudinary.api
+        
+        # Add cloudinary_storage to INSTALLED_APPS if not already there
+        if 'cloudinary_storage' not in INSTALLED_APPS:
+            INSTALLED_APPS = ['cloudinary_storage'] + INSTALLED_APPS
+        if 'cloudinary' not in INSTALLED_APPS:
+            INSTALLED_APPS.append('cloudinary')
+        
+        CLOUDINARY_STORAGE = {
+            'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
+            'API_KEY': CLOUDINARY_API_KEY,
+            'API_SECRET': CLOUDINARY_API_SECRET,
+            'OPTIONS': {
+                'secure': True,
+                'resource_type': 'auto',
+                'folder': 'portfolio',
+            }
+        }
+        
+        # Configure Cloudinary
+        cloudinary.config(
+            cloud_name=CLOUDINARY_CLOUD_NAME,
+            api_key=CLOUDINARY_API_KEY,
+            api_secret=CLOUDINARY_API_SECRET,
+            secure=True
+        )
+        
+        # Use Cloudinary for media files
+        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+        
+        # Cloudinary will handle media URLs directly
+        # No need to set MEDIA_URL as Cloudinary provides full URLs
+        
+        print(f"✓ Cloudinary configured successfully with cloud: {CLOUDINARY_CLOUD_NAME}")
+        
+    except ImportError:
+        print("⚠ Cloudinary not installed, falling back to local media storage")
+        USE_CLOUDINARY = False
+    except Exception as e:
+        print(f"⚠ Cloudinary configuration failed: {e}, falling back to local media storage")
+        USE_CLOUDINARY = False
+else:
+    if USE_CLOUDINARY:
+        print("⚠ Cloudinary credentials missing, falling back to local media storage")
+    USE_CLOUDINARY = False
+
+# Fallback to local media storage if Cloudinary is not available
+if not USE_CLOUDINARY and not USE_S3:
+    # Use WhiteNoise to serve media files in production
+    # This is not ideal for production but works as a fallback
+    print("ℹ Using local media storage with WhiteNoise")
     
-    # Add cloudinary_storage to INSTALLED_APPS if not already there
-    if 'cloudinary_storage' not in INSTALLED_APPS:
-        INSTALLED_APPS = ['cloudinary_storage'] + INSTALLED_APPS
-    if 'cloudinary' not in INSTALLED_APPS:
-        INSTALLED_APPS.append('cloudinary')
+    # Ensure media directory exists
+    import os
+    media_root = BASE_DIR / 'media'
+    os.makedirs(media_root, exist_ok=True)
     
-    CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
-        'API_KEY': config('CLOUDINARY_API_KEY'),
-        'API_SECRET': config('CLOUDINARY_API_SECRET'),
-    }
-    
-    # Configure Cloudinary
-    cloudinary.config(
-        cloud_name=config('CLOUDINARY_CLOUD_NAME'),
-        api_key=config('CLOUDINARY_API_KEY'),
-        api_secret=config('CLOUDINARY_API_SECRET'),
-        secure=True
-    )
-    
-    # Use Cloudinary for media files
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    
-    # Media URL will be handled by Cloudinary
+    # Use default file storage
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
     MEDIA_URL = '/media/'
+    MEDIA_ROOT = media_root
     
 elif USE_S3:
     # AWS S3 or DigitalOcean Spaces configuration

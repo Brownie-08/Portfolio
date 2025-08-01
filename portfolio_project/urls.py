@@ -33,9 +33,14 @@ urlpatterns = [
     path('', include('portfolio.urls')),
 ]
 
-# Serve media files in both development and production
-# Note: For production, consider using cloud storage (AWS S3, etc.) for better performance
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Serve media files - different handling for development vs production
+if settings.DEBUG:
+    # In development, serve media files directly
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+else:
+    # In production, still serve media files if using local storage as fallback
+    # This is handled by WhiteNoise middleware or cloud storage
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Serve static files in development only
 if settings.DEBUG:

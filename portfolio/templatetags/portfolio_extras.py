@@ -85,12 +85,30 @@ def media_url_fallback(file_field):
         return ''
     
     try:
+        # Check if file exists and has a name
+        if not hasattr(file_field, 'name') or not file_field.name:
+            return ''
+            
         # Try to get the direct media URL
-        return file_field.url
-    except (ValueError, AttributeError):
-        # If direct URL fails, use the fallback view
-        if hasattr(file_field, 'name') and file_field.name:
-            return reverse('portfolio:serve_media', kwargs={'path': file_field.name})
+        url = file_field.url
+        
+        # If using Cloudinary, the URL should be complete
+        if url.startswith('http'):
+            return url
+            
+        # For local files, ensure proper media URL formatting
+        if not url.startswith(settings.MEDIA_URL):
+            url = settings.MEDIA_URL + url.lstrip('/')
+            
+        return url
+        
+    except (ValueError, AttributeError, Exception) as e:
+        # If direct URL fails, try the fallback view
+        try:
+            if hasattr(file_field, 'name') and file_field.name:
+                return reverse('portfolio:serve_media', kwargs={'path': file_field.name})
+        except:
+            pass
         return ''
 
 @register.simple_tag
