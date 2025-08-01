@@ -97,6 +97,10 @@ STATICFILES_DIRS = [
 # Use the most basic WhiteNoise storage to avoid any compression issues
 STATICFILES_STORAGE = "whitenoise.storage.StaticFilesStorage"
 
+# WhiteNoise settings for better static file serving
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_AUTOREFRESH = True
+
 # Static files finders
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',

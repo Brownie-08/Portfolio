@@ -92,6 +92,7 @@ SESSION_CACHE_ALIAS = 'default'
 
 # Static and Media Files for Production
 # WhiteNoise is already configured in base.py
+# Override base.py settings for production
 WHITENOISE_USE_FINDERS = config('WHITENOISE_USE_FINDERS', default=False, cast=bool)
 WHITENOISE_AUTOREFRESH = config('WHITENOISE_AUTOREFRESH', default=False, cast=bool)
 

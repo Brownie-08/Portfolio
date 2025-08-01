@@ -42,11 +42,12 @@ else:
     # This is handled by WhiteNoise middleware or cloud storage
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-# Serve static files in development only
+# Serve static files - always include for fallback
+# WhiteNoise middleware should handle this in production, but include as fallback
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# Debug Toolbar URLs (development only)
 if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    
-    # Debug Toolbar URLs (development only)
     try:
         import debug_toolbar
         urlpatterns = [path('__debug__/', include(debug_toolbar.urls))] + urlpatterns
