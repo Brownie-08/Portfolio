@@ -27,7 +27,8 @@
                     {% if personal_info.profile_image %}
                         {% profile_image_url personal_info as profile_url %}
                         {% if profile_url %}
-                            <img src="{{ profile_url }}" alt="{{ personal_info.full_name }}" class="rounded-circle me-2" width="32" height="32" style="object-fit: cover;">
+                            <img src="{{ profile_url }}" alt="Profile" class="rounded-circle me-2" width="32" height="32" style="object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                            <i class="bi bi-code-slash me-2" style="display: none;"></i>
                         {% else %}
                             <i class="bi bi-code-slash me-2"></i>
                         {% endif %}

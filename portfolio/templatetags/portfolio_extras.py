@@ -115,21 +115,32 @@ def profile_image_url(personal_info):
         return None
     
     try:
+        # Check if the file has a name first
+        if not hasattr(personal_info.profile_image, 'name') or not personal_info.profile_image.name:
+            return None
         # Try to get the direct media URL first
         url = personal_info.profile_image.url
-        # Ensure the URL is properly formatted
+        # Ensure the URL is properly formatted for production
         if url and not url.startswith('http'):
             from django.conf import settings
-            if hasattr(settings, 'MEDIA_URL'):
+            if hasattr(settings, 'MEDIA_URL') and settings.MEDIA_URL:
                 if not url.startswith(settings.MEDIA_URL):
-                    url = settings.MEDIA_URL + url.lstrip('/')
-        return url
-    except (ValueError, AttributeError, Exception):
+                    url = settings.MEDIA_URL.rstrip('/') + '/' + url.lstrip('/')
+        # Additional validation for production URLs
+        if url and (url.startswith('/media/') or url.startswith('http')):
+            return url
+    except (ValueError, AttributeError, Exception) as e:
+        # Log the error for debugging in production
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(f"Error getting profile image URL: {e}")
         # Fallback to the serve view
         try:
             return reverse('portfolio:serve_profile_image')
-        except:
+        except Exception as fallback_error:
+            logger.warning(f"Fallback profile image URL also failed: {fallback_error}")
             return None
+    return None
 
 @register.simple_tag
 def resume_download_url(personal_info):

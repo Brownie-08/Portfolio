@@ -228,6 +228,16 @@ if not USE_CLOUDINARY and not USE_S3:
     MEDIA_URL = '/media/'
     MEDIA_ROOT = media_root
     
+    # Additional media serving configurations
+    # Add media URL patterns for development/fallback serving
+    if config('DEBUG', default=False, cast=bool):
+        # Only add URL patterns in debug mode
+        pass
+    else:
+        # In production, rely on WhiteNoise configured in wsgi.py
+        print(f"Media files will be served from: {MEDIA_ROOT}")
+        print(f"Media URL prefix: {MEDIA_URL}")
+    
 elif USE_S3:
     # AWS S3 or DigitalOcean Spaces configuration
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
