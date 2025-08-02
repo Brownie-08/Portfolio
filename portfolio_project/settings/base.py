@@ -23,6 +23,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sitemaps",
+    "cloudinary_storage",
+    "cloudinary",
     "crispy_forms",
     "crispy_bootstrap5",
     "portfolio",

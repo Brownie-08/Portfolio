@@ -135,127 +135,31 @@ CACHES = {
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db' if config('REDIS_URL', default=None) else 'django.contrib.sessions.backends.db'
 
 
-# Override STATICFILES_STORAGE for production to avoid manifest issues
-# Use the most basic WhiteNoise storage to avoid any compression conflicts
-STATICFILES_STORAGE = "whitenoise.storage.StaticFilesStorage"
-
 # Disable debug toolbar in production
 if 'debug_toolbar' in INSTALLED_APPS:
     INSTALLED_APPS.remove('debug_toolbar')
 
-
 # Remove debug middleware
 MIDDLEWARE = [middleware for middleware in MIDDLEWARE if 'debug_toolbar' not in middleware]
 
-# Media file serving in production
-# Note: Media files are served via WhiteNoise in WSGI for Render compatibility
-# For high-traffic production, consider using cloud storage (AWS S3, Cloudinary, etc.)
-
-# File storage configuration
-USE_CLOUDINARY = config('USE_CLOUDINARY', default=True, cast=bool)
-USE_S3 = config('USE_S3', default=False, cast=bool)
-
-# Check if Cloudinary credentials are available
-CLOUDINARY_CLOUD_NAME = config('CLOUDINARY_CLOUD_NAME', default=None)
-CLOUDINARY_API_KEY = config('CLOUDINARY_API_KEY', default=None)
-CLOUDINARY_API_SECRET = config('CLOUDINARY_API_SECRET', default=None)
-
-# Only use Cloudinary if all credentials are provided
-if USE_CLOUDINARY and all([CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET]):
-    try:
-        # Cloudinary configuration (recommended for Render)
-        import cloudinary
-        import cloudinary.uploader
-        import cloudinary.api
-        
-        # Add cloudinary_storage to INSTALLED_APPS if not already there
-        if 'cloudinary_storage' not in INSTALLED_APPS:
-            INSTALLED_APPS = ['cloudinary_storage'] + INSTALLED_APPS
-        if 'cloudinary' not in INSTALLED_APPS:
-            INSTALLED_APPS.append('cloudinary')
-        
-        CLOUDINARY_STORAGE = {
-            'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
-            'API_KEY': CLOUDINARY_API_KEY,
-            'API_SECRET': CLOUDINARY_API_SECRET,
-            'OPTIONS': {
-                'secure': True,
-                'resource_type': 'auto',
-                'folder': 'portfolio',
-            }
-        }
-        
-        # Configure Cloudinary
-        cloudinary.config(
-            cloud_name=CLOUDINARY_CLOUD_NAME,
-            api_key=CLOUDINARY_API_KEY,
-            api_secret=CLOUDINARY_API_SECRET,
-            secure=True
-        )
-        
-        # Use Cloudinary for media files
-        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-        
-        # Cloudinary will handle media URLs directly
-        # No need to set MEDIA_URL as Cloudinary provides full URLs
-        
-        print(f"✓ Cloudinary configured successfully with cloud: {CLOUDINARY_CLOUD_NAME}")
-        
-    except ImportError:
-        print("⚠ Cloudinary not installed, falling back to local media storage")
-        USE_CLOUDINARY = False
-    except Exception as e:
-        print(f"⚠ Cloudinary configuration failed: {e}, falling back to local media storage")
-        USE_CLOUDINARY = False
-else:
-    if USE_CLOUDINARY:
-        print("⚠ Cloudinary credentials missing, falling back to local media storage")
-    USE_CLOUDINARY = False
-
-# Fallback to local media storage if Cloudinary is not available
-if not USE_CLOUDINARY and not USE_S3:
-    # Use WhiteNoise to serve media files in production
-    # This is not ideal for production but works as a fallback
-    print("ℹ Using local media storage with WhiteNoise")
-    
-    # Ensure media directory exists
-    import os
-    media_root = BASE_DIR / 'media'
-    os.makedirs(media_root, exist_ok=True)
-    
-    # Use default file storage
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = media_root
-    
-    # Additional media serving configurations
-    # Add media URL patterns for development/fallback serving
-    if config('DEBUG', default=False, cast=bool):
-        # Only add URL patterns in debug mode
-        pass
-    else:
-        # In production, rely on WhiteNoise configured in wsgi.py
-        print(f"Media files will be served from: {MEDIA_ROOT}")
-        print(f"Media URL prefix: {MEDIA_URL}")
-    
-elif USE_S3:
-    # AWS S3 or DigitalOcean Spaces configuration
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    STATICFILES_STORAGE = 'storages.backends.s3boto3.StaticS3Boto3Storage'
-    
-    AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
-    AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
-    AWS_S3_ENDPOINT_URL = config('AWS_S3_ENDPOINT_URL', default=None)  # For DigitalOcean Spaces
-    AWS_S3_OBJECT_PARAMETERS = {
-        'CacheControl': 'max-age=86400',
+# Media files configuration for Cloudinary
+if config('USE_CLOUDINARY', default=False, cast=bool):
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
+        'API_KEY': config('CLOUDINARY_API_KEY'),
+        'API_SECRET': config('CLOUDINARY_API_SECRET')
     }
-    AWS_DEFAULT_ACL = 'public-read'
-    AWS_S3_CUSTOM_DOMAIN = config('AWS_S3_CUSTOM_DOMAIN', default=None)
-    
-    if AWS_S3_CUSTOM_DOMAIN:
-        STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
-        MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
-    else:
-        STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/static/'
-        MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/media/'
+    MEDIA_URL = 'https://res.cloudinary.com/' + config('CLOUDINARY_CLOUD_NAME') + '/image/upload/'
+else:
+    import os
+    # Use default Django file storage for media files
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    # Media files settings
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
+    # Ensure media directory exists
+    os.makedirs(MEDIA_ROOT, exist_ok=True)
+
+# Keep STATICFILES_STORAGE pointed at WhiteNoise for static assets
+STATICFILES_STORAGE = "whitenoise.storage.StaticFilesStorage"
