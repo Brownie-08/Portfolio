@@ -13,19 +13,13 @@ DEBUG = False
 # Vercel provides domain automatically
 ALLOWED_HOSTS = ['*']  # Vercel handles this securely
 
-# Database - Use environment variable or SQLite fallback for Vercel
+# Database - SQLite only for Vercel serverless
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': '/tmp/db.sqlite3',  # Vercel temp directory
     }
 }
-
-# If DATABASE_URL is provided (for external DB), use it
-DATABASE_URL = os.environ.get('DATABASE_URL')
-if DATABASE_URL:
-    import dj_database_url
-    DATABASES['default'] = dj_database_url.parse(DATABASE_URL)
 
 # Static files for Vercel
 STATIC_URL = '/static/'
