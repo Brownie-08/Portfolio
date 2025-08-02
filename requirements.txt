@@ -6,8 +6,8 @@ gunicorn==21.2.0
 Pillow==10.4.0
 dj-database-url==2.1.0
 
-# Database drivers (SQLite only - Vercel compatible)
-# PostgreSQL drivers removed for Vercel serverless deployment
+# Database drivers (PostgreSQL for Render)
+psycopg2-binary==2.9.7
 
 # Email and forms
 django-crispy-forms==2.1
