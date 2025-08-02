@@ -93,7 +93,12 @@
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="project-card card h-100 border-0">
                         {% if project.image %}
-                            <img src="{{ project.image.url }}" class="card-img-top" alt="{{ project.title }}">
+                            <img src="{{ project.image.url }}" class="card-img-top" alt="{{ project.title }}" 
+                                 style="height: 200px; object-fit: cover;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="bg-gradient-primary card-img-top d-none align-items-center justify-content-center" style="height: 200px; background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));">
+                                <i class="bi bi-code-slash text-white" style="font-size: 3rem;"></i>
+                            </div>
                         {% else %}
                             <div class="bg-gradient-primary card-img-top d-flex align-items-center justify-content-center" style="height: 200px; background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));">
                                 <i class="bi bi-code-slash text-white" style="font-size: 3rem;"></i>

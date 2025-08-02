@@ -12,7 +12,7 @@ from decouple import config, Csv
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-4_suyoyxt+q9tid1_7q!4y6lt*h71r7*&9&vxv+bn0oy_7ya4o')
+SECRET_KEY = config('DJANGO_SECRET_KEY', default=config('SECRET_KEY', default='django-insecure-4_suyoyxt+q9tid1_7q!4y6lt*h71r7*&9&vxv+bn0oy_7ya4o'))
 
 # Application definition
 INSTALLED_APPS = [

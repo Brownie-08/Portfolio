@@ -18,8 +18,12 @@ services:
         value: 547248818221456
       - key: CLOUDINARY_API_SECRET
         value: 611drBROvgh5Bkip4HZYaLRoddI
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
       - key: SECRET_KEY
         generateValue: true
+      - key: DJANGO_ALLOWED_HOSTS
+        value: "*"
       - key: ALLOWED_HOSTS
         value: "*"
 

@@ -94,7 +94,12 @@
                         <div class="card h-100 border-0 shadow-sm hover-lift">
                             {% if project.image %}
                                 <img src="{{ project.image.url }}" class="card-img-top" alt="{{ project.title }}" 
-                                     style="height: 200px; object-fit: cover;">
+                                     style="height: 200px; object-fit: cover;"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="bg-secondary card-img-top d-none align-items-center justify-content-center" 
+                                     style="height: 200px;">
+                                    <i class="bi bi-image text-white fs-1"></i>
+                                </div>
                             {% else %}
                                 <div class="bg-secondary card-img-top d-flex align-items-center justify-content-center" 
                                      style="height: 200px;">

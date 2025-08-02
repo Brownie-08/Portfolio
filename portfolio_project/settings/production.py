@@ -13,7 +13,7 @@ import dj_database_url
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Allowed hosts for production - Render and custom domains
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=Csv())
+ALLOWED_HOSTS = config('DJANGO_ALLOWED_HOSTS', default=config('ALLOWED_HOSTS', default='*'), cast=Csv())
 
 # Add Render domain if provided
 render_domain = config('RENDER_EXTERNAL_HOSTNAME', default=None)
@@ -144,13 +144,23 @@ MIDDLEWARE = [middleware for middleware in MIDDLEWARE if 'debug_toolbar' not in 
 
 # Media files configuration for Cloudinary
 if config('USE_CLOUDINARY', default=False, cast=bool):
+    import cloudinary
+    import cloudinary.uploader
+    import cloudinary.api
+    
+    # Configure Cloudinary
+    cloudinary.config(
+        cloud_name=config('CLOUDINARY_CLOUD_NAME'),
+        api_key=config('CLOUDINARY_API_KEY'),
+        api_secret=config('CLOUDINARY_API_SECRET'),
+        secure=True  # Force HTTPS
+    )
+    
+    # Use Cloudinary for media files
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
-        'API_KEY': config('CLOUDINARY_API_KEY'),
-        'API_SECRET': config('CLOUDINARY_API_SECRET')
-    }
-    MEDIA_URL = 'https://res.cloudinary.com/' + config('CLOUDINARY_CLOUD_NAME') + '/image/upload/'
+    
+    # Let Cloudinary handle the MEDIA_URL
+    MEDIA_URL = '/media/'  # This will be overridden by Cloudinary
 else:
     import os
     # Use default Django file storage for media files
