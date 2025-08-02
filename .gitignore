@@ -72,6 +72,7 @@ venv.bak/
 # Database backups and sensitive data
 *.json
 !railway.json
+!vercel.json
 !package.json
 !requirements.json
 backup_data.json
