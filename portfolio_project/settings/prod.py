@@ -96,18 +96,8 @@ SESSION_CACHE_ALIAS = 'default'
 WHITENOISE_USE_FINDERS = config('WHITENOISE_USE_FINDERS', default=False, cast=bool)
 WHITENOISE_AUTOREFRESH = config('WHITENOISE_AUTOREFRESH', default=False, cast=bool)
 
-# Media files - consider using cloud storage in production
-# Configure these if using cloud storage like AWS S3
-AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default='')
-AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default='')
-AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME', default='')
-AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='')
-
-if AWS_STORAGE_BUCKET_NAME:
-    # Use S3 for media files if configured
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+# Media files - using Cloudinary in production
+# Cloudinary configuration is handled in production.py
 
 # Logging Configuration for Production
 LOGGING = {
