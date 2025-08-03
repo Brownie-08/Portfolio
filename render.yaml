@@ -2,10 +2,10 @@ services:
   - type: web
     runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn portfolio_project.wsgi
+    startCommand: python manage.py migrate && gunicorn portfolio_project.wsgi
     envVars:
       - key: DEBUG
-        value: False
+        value: "False"
       - key: DJANGO_SETTINGS_MODULE
         value: portfolio_project.settings.production
       - key: PYTHON_VERSION
@@ -19,13 +19,13 @@ services:
       - key: CLOUDINARY_API_SECRET
         value: 611drBROvgh5Bkip4HZYaLRoddI
       - key: DJANGO_SECRET_KEY
-        generateValue: true
+        sync: false                # managed via dashboard
       - key: SECRET_KEY
         generateValue: true
       - key: DJANGO_ALLOWED_HOSTS
         value: "*"
       - key: ALLOWED_HOSTS
-        value: "*"
+        value: your-render-domain.onrender.com
 
 databases:
   - name: portfolio-db
