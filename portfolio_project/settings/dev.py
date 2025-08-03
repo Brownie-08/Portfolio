@@ -6,25 +6,22 @@ Inherits from base.py and overrides/adds development-specific configurations.
 """
 
 from .base import *
-from decouple import config, Csv
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
-
-# Allowed hosts for development
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0', cast=Csv())
+# Development settings override base settings
+# DEBUG and ALLOWED_HOSTS are already configured in base.py using django-environ
+# Additional development-specific overrides can be set here
 
 # Database configuration for development
 # Using environment variables with SQLite as fallback
-DATABASE_URL = config('DATABASE_URL', default=None)
+DATABASE_URL = env('DATABASE_URL', default=None)
 
 # Check for separate MySQL settings first
-DB_ENGINE = config('DB_ENGINE', default=None)
-DB_NAME = config('DB_NAME', default=None)
-DB_USER = config('DB_USER', default=None)
-DB_PASSWORD = config('DB_PASSWORD', default=None)
-DB_HOST = config('DB_HOST', default='localhost')
-DB_PORT = config('DB_PORT', default=3306, cast=int)
+DB_ENGINE = env('DB_ENGINE', default=None)
+DB_NAME = env('DB_NAME', default=None)
+DB_USER = env('DB_USER', default=None)
+DB_PASSWORD = env('DB_PASSWORD', default=None)
+DB_HOST = env('DB_HOST', default='localhost')
+DB_PORT = env.int('DB_PORT', default=3306)
 
 if DB_ENGINE and DB_NAME:
     # Use separate database settings
@@ -99,8 +96,8 @@ if DEBUG:
     except ImportError:
         pass
 
-# Email backend for development (console output)
-EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
+# Email backend for development (console output) - already configured in base.py
+# EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
 
 # Logging configuration for development
 LOGGING = {
@@ -130,7 +127,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': config('DJANGO_LOG_LEVEL', default='INFO'),
+            'level': env('DJANGO_LOG_LEVEL', default='INFO'),
             'propagate': False,
         },
         'portfolio': {
@@ -150,16 +147,16 @@ SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
 # Media files configuration for Cloudinary (development)
-if config('USE_CLOUDINARY', default=False, cast=bool):
+if env.bool('USE_CLOUDINARY', default=False):
     import cloudinary
     import cloudinary.uploader
     import cloudinary.api
     
     # Configure Cloudinary
     cloudinary.config(
-        cloud_name=config('CLOUDINARY_CLOUD_NAME'),
-        api_key=config('CLOUDINARY_API_KEY'),
-        api_secret=config('CLOUDINARY_API_SECRET'),
+        cloud_name=env('CLOUDINARY_CLOUD_NAME'),
+        api_key=env('CLOUDINARY_API_KEY'),
+        api_secret=env('CLOUDINARY_API_SECRET'),
         secure=True  # Force HTTPS
     )
     

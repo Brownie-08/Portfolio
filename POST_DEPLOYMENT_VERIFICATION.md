@@ -3,7 +3,7 @@
 ## Step 1: Browse Live Site & Verify Assets
 
 ### 1.1 Basic Site Functionality
-Visit your Render deployment URL: `https://yourapp.onrender.com`
+Visit your Render deployment URL: `https://portfolio-56yz.onrender.com/`
 
 **Check these pages:**
 - [ ] Homepage loads correctly
@@ -216,4 +216,4 @@ git push origin main --force-with-lease
 
 ---
 
-**Note:** Replace `https://yourapp.onrender.com` with your actual Render deployment URL.
+**Note:** Your live site is deployed at: `https://portfolio-56yz.onrender.com/`
