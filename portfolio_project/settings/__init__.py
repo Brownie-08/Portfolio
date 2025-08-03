@@ -12,6 +12,8 @@ ENVIRONMENT = os.environ.get('DJANGO_ENVIRONMENT', 'development')
 
 if ENVIRONMENT == 'production':
     from .prod import *
+elif ENVIRONMENT == 'deploy_check':
+    from .deploy_check import *
 elif ENVIRONMENT == 'development':
     from .dev import *
 else:
