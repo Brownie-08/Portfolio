@@ -54,9 +54,11 @@ else:
 
 # Override django-environ settings for Railway
 # Use os.environ directly since Railway sets environment variables directly
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY') or os.environ.get('SECRET_KEY')
 if not SECRET_KEY:
-    raise ValueError("DJANGO_SECRET_KEY environment variable is required")
+    # Generate a basic secret key for testing (not secure for production)
+    SECRET_KEY = 'django-insecure-railway-deployment-temp-key-replace-with-secure-key'
+    print("Warning: Using temporary SECRET_KEY. Set DJANGO_SECRET_KEY or SECRET_KEY environment variable.")
 
 # Email configuration
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
