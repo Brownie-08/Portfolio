@@ -148,23 +148,32 @@ CSRF_COOKIE_SECURE = False
 
 # Media files configuration for Cloudinary (development)
 if env.bool('USE_CLOUDINARY', default=False):
-    import cloudinary
-    import cloudinary.uploader
-    import cloudinary.api
-    
-    # Configure Cloudinary
-    cloudinary.config(
-        cloud_name=env('CLOUDINARY_CLOUD_NAME'),
-        api_key=env('CLOUDINARY_API_KEY'),
-        api_secret=env('CLOUDINARY_API_SECRET'),
-        secure=True  # Force HTTPS
-    )
-    
-    # Use Cloudinary for media files
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    
-    # Let Cloudinary handle the MEDIA_URL
-    MEDIA_URL = '/media/'  # This will be overridden by Cloudinary
+    try:
+        import cloudinary
+        import cloudinary.uploader
+        import cloudinary.api
+        
+        # Configure Cloudinary
+        cloudinary.config(
+            cloud_name=env('CLOUDINARY_CLOUD_NAME'),
+            api_key=env('CLOUDINARY_API_KEY'),
+            api_secret=env('CLOUDINARY_API_SECRET'),
+            secure=True  # Force HTTPS
+        )
+        
+        # Use Cloudinary for media files
+        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+        
+        # Let Cloudinary handle the MEDIA_URL
+        MEDIA_URL = '/media/'  # This will be overridden by Cloudinary
+    except (ImportError, AttributeError) as e:
+        print(f"Warning: Cloudinary configuration failed: {e}")
+        # Fallback to local storage
+        import os
+        DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+        MEDIA_URL = '/media/'
+        MEDIA_ROOT = BASE_DIR / 'media'
+        os.makedirs(MEDIA_ROOT, exist_ok=True)
 else:
     import os
     # Use default Django file storage for media files
