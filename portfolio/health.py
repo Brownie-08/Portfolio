@@ -64,3 +64,14 @@ def ready_check(request):
             "status": "not_ready",
             "error": str(e)
         }, status=503)
+
+
+@never_cache
+@csrf_exempt
+def simple_health_check(request):
+    """
+    Simple health check that just returns OK without database checks
+    For Railway deployment health check
+    """
+    from django.http import HttpResponse
+    return HttpResponse("OK", content_type="text/plain")

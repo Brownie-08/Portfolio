@@ -5,9 +5,23 @@ This file contains settings specific to Railway environment.
 Inherits from base.py and overrides/adds Railway-specific configurations.
 """
 
-from .base import *
 import dj_database_url
 import os
+
+# Set required environment variables before importing base
+# This ensures django-environ can read them properly
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY') or os.environ.get('SECRET_KEY')
+if not SECRET_KEY:
+    SECRET_KEY = 'django-insecure-railway-deployment-temp-key-replace-with-secure-key-12345678901234567890'
+    print("Warning: Using temporary SECRET_KEY. Set DJANGO_SECRET_KEY or SECRET_KEY environment variable.")
+
+# Ensure environment variables are set before base.py imports
+os.environ.setdefault('DJANGO_SECRET_KEY', SECRET_KEY)
+os.environ.setdefault('DEBUG', 'False')
+os.environ.setdefault('ALLOWED_HOSTS', '*')
+
+# Now import base settings
+from .base import *
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 't')
@@ -57,8 +71,12 @@ else:
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY') or os.environ.get('SECRET_KEY')
 if not SECRET_KEY:
     # Generate a basic secret key for testing (not secure for production)
-    SECRET_KEY = 'django-insecure-railway-deployment-temp-key-replace-with-secure-key'
+    SECRET_KEY = 'django-insecure-railway-deployment-temp-key-replace-with-secure-key-12345678901234567890'
     print("Warning: Using temporary SECRET_KEY. Set DJANGO_SECRET_KEY or SECRET_KEY environment variable.")
+
+# Override the django-environ base setting that expects SECRET_KEY to be set
+# This prevents ImportError during Railway startup
+os.environ.setdefault('DJANGO_SECRET_KEY', SECRET_KEY)
 
 # Email configuration
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
