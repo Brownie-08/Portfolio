@@ -74,4 +74,4 @@ def simple_health_check(request):
     For Railway deployment health check
     """
     from django.http import HttpResponse
-    return HttpResponse("OK", content_type="text/plain")
+    return HttpResponse("OK", status=200, content_type="text/plain")
