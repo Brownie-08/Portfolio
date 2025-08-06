@@ -62,4 +62,8 @@ class Command(BaseCommand):
         for testimonial in testimonials:
             if not testimonial.avatar:
                 # Testimonials are ready for avatar uploads
-                self.stdout.write(f'Testimonial from "{testimonial.client_name}" ready for avatar upload')
+                try:
+                    name = getattr(testimonial, 'name', 'Unknown')
+                    self.stdout.write(f'Testimonial from "{name}" ready for avatar upload')
+                except AttributeError:
+                    self.stdout.write('Testimonial ready for avatar upload (name field missing)')
