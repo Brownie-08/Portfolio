@@ -1,8 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from portfolio.models import (
-    PersonalInfo, Project, Skill, Education, Certification, Award,
-    CareerTimeline, Testimonial, BlogPost, FooterLink, Tag
+    PersonalInfo, Project, Skill, Education, Testimonial, BlogPost, FooterLink, Tag
 )
 from django.utils.text import slugify
 
@@ -54,10 +53,12 @@ class Command(BaseCommand):
             defaults={
                 'full_name': 'Peter E. Udoh',
                 'portfolio_name': 'Peter Udoh Portfolio',
-                'tagline': 'Full-Stack Developer & Tech Enthusiast',
                 'bio': """I'm a passionate full-stack developer with expertise in Python, Django, 
                          JavaScript, and modern web technologies. I love creating efficient, 
                          scalable solutions and turning ideas into reality.""",
+                'about_intro': 'Welcome to my portfolio! I am a dedicated full-stack developer with a passion for creating innovative web applications.',
+                'current_role': 'Full-Stack Developer & Tech Enthusiast',
+                'professional_summary': 'Experienced in building scalable web applications using modern technologies.',
                 'email': 'peter@example.com',
                 'phone': '+1234567890',
                 'location': 'Remote / Global',
@@ -65,9 +66,12 @@ class Command(BaseCommand):
                 'github_url': 'https://github.com/peterudoh',
                 'twitter_url': 'https://twitter.com/peterudoh',
                 'website_url': 'https://peterudoh.dev',
-                'years_of_experience': 3,
-                'clients_served': 15,
-                'projects_completed': 25,
+                'years_experience': 3,
+                'technical_skills': 'Python, Django, JavaScript, React, PostgreSQL, Docker, AWS',
+                'soft_skills': 'Problem Solving, Team Collaboration, Communication, Project Management',
+                'interests': 'Open Source, Machine Learning, Web Development, Photography',
+                'meta_description': 'Peter E. Udoh - Full-Stack Developer specializing in Python, Django, and modern web technologies',
+                'meta_keywords': 'Peter Udoh, Full-Stack Developer, Python, Django, Web Development',
                 'is_active': True,
             }
         )
@@ -112,20 +116,22 @@ class Command(BaseCommand):
         education_data = [
             {
                 'degree': 'Bachelor of Science in Computer Science',
-                'institution': 'University of Technology',
+                'school_name': 'University of Technology',
+                'field_of_study': 'Computer Science',
                 'location': 'Tech City',
                 'start_date': '2018-09-01',
                 'end_date': '2022-06-01',
-                'gpa': '3.8',
+                'grade': '3.8 GPA',
                 'description': 'Focused on software engineering, algorithms, and web development.',
-                'is_featured': True,
+                'is_current': False,
+                'order': 1,
             }
         ]
 
         for edu_data in education_data:
             education, created = Education.objects.get_or_create(
                 degree=edu_data['degree'],
-                institution=edu_data['institution'],
+                school_name=edu_data['school_name'],
                 defaults=edu_data
             )
             if created:
@@ -138,36 +144,27 @@ class Command(BaseCommand):
                 'title': 'E-Commerce Platform',
                 'slug': 'e-commerce-platform',
                 'description': 'Full-featured e-commerce platform built with Django and React',
-                'long_description': 'A comprehensive e-commerce solution featuring user authentication, product management, shopping cart, payment processing, and admin dashboard.',
                 'tech_stack': 'Django, React, PostgreSQL, Stripe API',
-                'github_url': 'https://github.com/peterudoh/ecommerce-platform',
+                'repo_url': 'https://github.com/peterudoh/ecommerce-platform',
                 'live_url': 'https://ecommerce-demo.com',
-                'status': 'completed',
                 'is_featured': True,
-                'order': 1,
             },
             {
                 'title': 'Task Management API',
                 'slug': 'task-management-api',
                 'description': 'RESTful API for task management with team collaboration features',
-                'long_description': 'A robust API built with Django REST Framework featuring user management, project organization, task tracking, and real-time notifications.',
                 'tech_stack': 'Django REST Framework, PostgreSQL, Redis, Celery',
-                'github_url': 'https://github.com/peterudoh/task-api',
-                'status': 'completed',
+                'repo_url': 'https://github.com/peterudoh/task-api',
                 'is_featured': True,
-                'order': 2,
             },
             {
                 'title': 'Portfolio Website',
                 'slug': 'portfolio-website',
                 'description': 'Personal portfolio website showcasing projects and skills',
-                'long_description': 'A responsive portfolio website built with Django, featuring dynamic content management, contact forms, and admin interface.',
                 'tech_stack': 'Django, Bootstrap, PostgreSQL, Railway',
-                'github_url': 'https://github.com/peterudoh/portfolio',
+                'repo_url': 'https://github.com/peterudoh/portfolio',
                 'live_url': 'https://peterudoh.dev',
-                'status': 'completed',
                 'is_featured': True,
-                'order': 3,
             },
         ]
 
@@ -196,33 +193,27 @@ class Command(BaseCommand):
         """Seed testimonial data"""
         testimonials_data = [
             {
-                'client_name': 'Sarah Johnson',
-                'client_title': 'Product Manager',
-                'client_company': 'TechStart Inc.',
-                'testimonial': 'Peter delivered exceptional work on our e-commerce platform. His attention to detail and technical expertise made our project a success.',
-                'rating': 5,
+                'name': 'Sarah Johnson',
+                'role': 'Product Manager at TechStart Inc.',
+                'comment': 'Peter delivered exceptional work on our e-commerce platform. His attention to detail and technical expertise made our project a success.',
                 'is_featured': True,
-                'order': 1,
             },
             {
-                'client_name': 'Mike Chen',
-                'client_title': 'CTO',
-                'client_company': 'InnovateLab',
-                'testimonial': 'Working with Peter was a great experience. He understood our requirements perfectly and delivered a robust API solution.',
-                'rating': 5,
+                'name': 'Mike Chen',
+                'role': 'CTO at InnovateLab',
+                'comment': 'Working with Peter was a great experience. He understood our requirements perfectly and delivered a robust API solution.',
                 'is_featured': True,
-                'order': 2,
             },
         ]
 
         for testimonial_data in testimonials_data:
             testimonial, created = Testimonial.objects.get_or_create(
-                client_name=testimonial_data['client_name'],
-                client_company=testimonial_data['client_company'],
+                name=testimonial_data['name'],
+                role=testimonial_data['role'],
                 defaults=testimonial_data
             )
             if created:
-                self.stdout.write(f'✅ Created testimonial from: {testimonial.client_name}')
+                self.stdout.write(f'✅ Created testimonial from: {testimonial.name}')
 
     def seed_footer_links(self):
         """Seed footer links"""
