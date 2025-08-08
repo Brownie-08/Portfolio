@@ -154,18 +154,48 @@ if USE_CLOUDINARY:
         import cloudinary.uploader
         import cloudinary.api
         
-        # Configure Cloudinary
+        # Configure Cloudinary with proper settings for public access
         cloudinary.config(
             cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
             api_key=os.environ.get('CLOUDINARY_API_KEY'),
             api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
-            secure=True
+            secure=True,
+            # Force public access for all uploads
+            default_upload_options={
+                'resource_type': 'auto',  # Auto-detect file type
+                'type': 'upload',         # Standard upload type
+                'access_mode': 'public',  # Ensure public access
+                'invalidate': True,       # Clear cache for updated files
+            }
         )
         
         # Use Cloudinary for media files
         DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
         MEDIA_URL = '/media/'
-        print("Using Cloudinary for media storage")
+        
+        # Cloudinary-specific settings for better file handling
+        CLOUDINARY_STORAGE = {
+            'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+            'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+            'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+            'SECURE': True,
+            'MEDIA_TAG': 'media',
+            'INVALID_VIDEO_ERROR_MESSAGE': 'Please upload a valid video file.',
+            'EXCLUDE_DELETE_ORPHANED_MEDIA_PATHS': (),
+            'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpe', 'jpeg', 'jpc', 'jp2', 'j2k', 'wdp', 'jxr', 'hdp', 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff'],
+            'STATICFILES_MANIFEST_ROOT': os.path.join(BASE_DIR, 'manifest'),
+            'DEFAULT_FILE_STORAGE': 'cloudinary_storage.storage.MediaCloudinaryStorage',
+            'OPTIONS': {
+                'resource_type': 'auto',
+                'type': 'upload',
+                'access_mode': 'public',
+                'format': 'auto',
+                'quality': 'auto:good',
+                'fetch_format': 'auto',
+            }
+        }
+        
+        print("Using Cloudinary for media storage with public access")
     except (ImportError, AttributeError) as e:
         print(f"Warning: Cloudinary configuration failed: {e}")
         # Fallback to local storage

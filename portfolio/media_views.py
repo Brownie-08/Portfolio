@@ -103,8 +103,10 @@ def serve_resume(request):
     
     This is a convenience view for serving the active user's resume.
     Handles both local file storage and cloud storage scenarios.
+    For Cloudinary, generates a proper public URL.
     """
     from .models import PersonalInfo
+    from django.shortcuts import redirect
     import logging
     
     logger = logging.getLogger(__name__)
@@ -120,10 +122,47 @@ def serve_resume(request):
             raise Http404("Resume file not found")
         
         # Handle cloud storage (Cloudinary) vs local storage
-        if hasattr(settings, 'USE_CLOUDINARY') and settings.USE_CLOUDINARY:
-            # For cloud storage, redirect to the URL
-            from django.shortcuts import redirect
-            return redirect(personal_info.resume.url)
+        if hasattr(settings, 'USE_CLOUDINARY') and getattr(settings, 'USE_CLOUDINARY', False):
+            # For Cloudinary, generate a proper public URL
+            try:
+                import cloudinary.utils
+                
+                # Get the public ID from the file name
+                if hasattr(personal_info.resume, 'public_id'):
+                    public_id = personal_info.resume.public_id
+                else:
+                    # Extract public ID from file name
+                    file_name = personal_info.resume.name
+                    if file_name.startswith('media/'):
+                        file_name = file_name[6:]  # Remove 'media/' prefix
+                    # Remove file extension for public ID
+                    public_id = os.path.splitext(file_name)[0]
+                
+                logger.info(f"Generating Cloudinary URL for public_id: {public_id}")
+                
+                # Generate a public URL for the file
+                cloudinary_url = cloudinary.utils.cloudinary_url(
+                    public_id,
+                    resource_type="raw",  # Use 'raw' for non-image files like PDFs
+                    type="upload",
+                    secure=True,
+                    sign_url=False,  # Public URL, no signature needed
+                    flags="attachment",  # Force download
+                )[0]
+                
+                logger.info(f"Generated Cloudinary URL: {cloudinary_url}")
+                return redirect(cloudinary_url)
+                
+            except Exception as e:
+                logger.error(f"Cloudinary URL generation failed: {e}")
+                # Fallback to direct URL
+                try:
+                    direct_url = personal_info.resume.url
+                    logger.info(f"Using direct Cloudinary URL: {direct_url}")
+                    return redirect(direct_url)
+                except Exception as e2:
+                    logger.error(f"Direct Cloudinary URL also failed: {e2}")
+                    raise Http404("Unable to access resume file")
         else:
             # For local storage, serve the file directly
             try:
