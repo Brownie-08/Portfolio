@@ -142,20 +142,72 @@ def profile_image_url(personal_info):
             return None
     return None
 
+
 @register.simple_tag
 def resume_download_url(personal_info):
     """
     Get the resume download URL with production fallback.
     
-    Usage: {% resume_download_url personal_info %}
+    This function handles both cloud storage and local storage scenarios
+    and provides multiple fallback options for maximum compatibility.
+    
+    Usage: {% resume_download_url personal_info as resume_url %}
     """
     if not personal_info or not personal_info.resume:
         return ''
     
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    # Check if file has a name first
+    if not hasattr(personal_info.resume, 'name') or not personal_info.resume.name:
+        logger.warning("Resume file has no name attribute")
+        return ''
+    
     try:
-        return personal_info.resume.url
-    except (ValueError, AttributeError):
-        return reverse('portfolio:serve_resume')
+        # For cloud storage (like Cloudinary), .url should work directly
+        if hasattr(settings, 'USE_CLOUDINARY') and getattr(settings, 'USE_CLOUDINARY', False):
+            try:
+                url = personal_info.resume.url
+                if url:
+                    return url
+            except Exception as e:
+                logger.warning(f"Cloudinary resume URL failed: {e}")
+        
+        # For local storage, try direct URL first
+        try:
+            url = personal_info.resume.url
+            if url:
+                # Ensure proper formatting for production
+                if not url.startswith('http') and not url.startswith('/'):
+                    # Add media URL prefix if needed
+                    media_url = getattr(settings, 'MEDIA_URL', '/media/')
+                    url = media_url.rstrip('/') + '/' + url.lstrip('/')
+                return url
+        except (ValueError, AttributeError, OSError) as e:
+            logger.warning(f"Direct resume URL failed: {e}")
+        
+        # Fallback to our custom serve_resume view
+        try:
+            return reverse('portfolio:serve_resume')
+        except Exception as e:
+            logger.error(f"Resume fallback URL failed: {e}")
+            
+        # Last resort fallback
+        try:
+            return reverse('portfolio:download_resume')
+        except Exception as e:
+            logger.error(f"All resume URL options failed: {e}")
+            return ''
+            
+    except Exception as e:
+        logger.error(f"Unexpected error in resume_download_url: {e}")
+        # Emergency fallback
+        try:
+            return reverse('portfolio:serve_resume')
+        except:
+            return ''
+
 
 @register.filter
 def file_exists(file_field):

@@ -26,4 +26,6 @@ urlpatterns = [
     path('media-serve/<path:path>', media_views.serve_media, name='serve_media'),
     path('profile-image/', media_views.serve_profile_image, name='serve_profile_image'),
     path('resume-download/', media_views.serve_resume, name='serve_resume'),
+    path('download-resume/', media_views.serve_resume, name='download_resume'),  # Alternative URL
+    path('cv/', media_views.serve_resume, name='cv_download'),  # Alternative URL
 ]

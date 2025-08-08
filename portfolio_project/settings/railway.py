@@ -144,6 +144,10 @@ WHITENOISE_AUTOREFRESH = False
 # Media files configuration
 USE_CLOUDINARY = os.environ.get('USE_CLOUDINARY', 'False').lower() in ('true', '1', 't')
 
+# Set media root directory first
+MEDIA_ROOT = BASE_DIR / 'media'
+os.makedirs(MEDIA_ROOT, exist_ok=True)
+
 if USE_CLOUDINARY:
     try:
         import cloudinary
@@ -161,19 +165,18 @@ if USE_CLOUDINARY:
         # Use Cloudinary for media files
         DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
         MEDIA_URL = '/media/'
+        print("Using Cloudinary for media storage")
     except (ImportError, AttributeError) as e:
         print(f"Warning: Cloudinary configuration failed: {e}")
         # Fallback to local storage
         DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
         MEDIA_URL = '/media/'
-        MEDIA_ROOT = BASE_DIR / 'media'
-        os.makedirs(MEDIA_ROOT, exist_ok=True)
+        print("Falling back to local media storage")
 else:
     # Use default Django file storage
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
     MEDIA_URL = '/media/'
-    MEDIA_ROOT = BASE_DIR / 'media'
-    os.makedirs(MEDIA_ROOT, exist_ok=True)
+    print("Using local media storage")
 
 # Logging configuration for Railway (console only)
 LOGGING = {
