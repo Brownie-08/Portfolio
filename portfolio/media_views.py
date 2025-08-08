@@ -121,8 +121,50 @@ def serve_resume(request):
             logger.warning("No resume file found in PersonalInfo")
             raise Http404("Resume file not found")
         
-        # Handle cloud storage (Cloudinary) vs local storage
-        if hasattr(settings, 'USE_CLOUDINARY') and getattr(settings, 'USE_CLOUDINARY', False):
+        # Handle Railway persistent volume or local storage
+        # Always try local storage first (Railway persistent volume)
+        try:
+            file_path = personal_info.resume.path
+            if os.path.exists(file_path) and os.path.isfile(file_path):
+                logger.info(f"Found resume file at: {file_path}")
+                
+                # Security check: ensure file is within MEDIA_ROOT
+                media_root = os.path.abspath(settings.MEDIA_ROOT)
+                file_path = os.path.abspath(file_path)
+                
+                if not file_path.startswith(media_root):
+                    logger.error(f"Security violation: file path outside media root")
+                    raise Http404("Access denied")
+                
+                # Determine content type
+                content_type, _ = mimetypes.guess_type(file_path)
+                if content_type is None:
+                    content_type = 'application/pdf'
+                
+                # Get the original filename for download
+                filename = os.path.basename(personal_info.resume.name)
+                if not filename:
+                    filename = f"resume.{content_type.split('/')[-1]}"
+                
+                response = FileResponse(
+                    open(file_path, 'rb'),
+                    content_type=content_type,
+                    as_attachment=True,
+                    filename=filename
+                )
+                
+                # Add security headers
+                response['X-Content-Type-Options'] = 'nosniff'
+                response['X-Frame-Options'] = 'DENY'
+                response['Cache-Control'] = 'max-age=3600'  # Cache for 1 hour
+                
+                logger.info(f"Successfully serving resume: {filename}")
+                return response
+        except Exception as e:
+            logger.warning(f"Local file access failed: {e}")
+            
+        # Fallback: Handle cloud storage (Cloudinary) if enabled
+        if hasattr(settings, 'USE_CLOUDINARY') and getattr(settings, 'USE_CLOUDINARY', False) and not getattr(settings, 'USE_LOCAL_STORAGE', True):
             # For Cloudinary, generate a proper public URL
             try:
                 import cloudinary.utils

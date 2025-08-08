@@ -165,40 +165,40 @@ def resume_download_url(personal_info):
         return ''
     
     try:
-        # For cloud storage (like Cloudinary), .url should work directly
-        if hasattr(settings, 'USE_CLOUDINARY') and getattr(settings, 'USE_CLOUDINARY', False):
-            try:
-                url = personal_info.resume.url
-                if url:
-                    return url
-            except Exception as e:
-                logger.warning(f"Cloudinary resume URL failed: {e}")
-        
-        # For local storage, try direct URL first
+        # Always prioritize local storage (Railway persistent volume)
+        # Try direct file URL first
         try:
             url = personal_info.resume.url
             if url:
-                # Ensure proper formatting for production
+                # For local storage, ensure proper URL formatting
                 if not url.startswith('http') and not url.startswith('/'):
                     # Add media URL prefix if needed
                     media_url = getattr(settings, 'MEDIA_URL', '/media/')
                     url = media_url.rstrip('/') + '/' + url.lstrip('/')
+                
+                logger.info(f"Using direct resume URL: {url}")
                 return url
         except (ValueError, AttributeError, OSError) as e:
             logger.warning(f"Direct resume URL failed: {e}")
         
-        # Fallback to our custom serve_resume view
+        # Fallback to our custom serve_resume view (works with Railway persistent volume)
         try:
-            return reverse('portfolio:serve_resume')
+            url = reverse('portfolio:serve_resume')
+            logger.info(f"Using serve_resume fallback URL: {url}")
+            return url
         except Exception as e:
-            logger.error(f"Resume fallback URL failed: {e}")
-            
-        # Last resort fallback
+            logger.error(f"serve_resume URL failed: {e}")
+        
+        # Last resort fallbacks
         try:
             return reverse('portfolio:download_resume')
         except Exception as e:
-            logger.error(f"All resume URL options failed: {e}")
-            return ''
+            logger.error(f"download_resume URL failed: {e}")
+            try:
+                return reverse('portfolio:cv_download')
+            except Exception as e2:
+                logger.error(f"All resume URL options failed: {e}, {e2}")
+                return ''
             
     except Exception as e:
         logger.error(f"Unexpected error in resume_download_url: {e}")

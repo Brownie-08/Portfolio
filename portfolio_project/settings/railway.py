@@ -141,14 +141,29 @@ STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
 WHITENOISE_USE_FINDERS = False
 WHITENOISE_AUTOREFRESH = False
 
-# Media files configuration
+# Media files configuration for Railway Persistent Volume
+# Railway persistent volume should be mounted to /app/media
+if os.path.exists('/app/media'):
+    # Production: Use Railway persistent volume
+    MEDIA_ROOT = '/app/media'
+    print("Using Railway persistent volume for media files")
+else:
+    # Development: Use local media directory
+    MEDIA_ROOT = BASE_DIR / 'media'
+    os.makedirs(MEDIA_ROOT, exist_ok=True)
+    print("Using local media directory")
+
+MEDIA_URL = '/media/'
+
+# Use Django default file storage (local/Railway persistent volume)
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+print(f"Using local/Railway media storage: {MEDIA_ROOT}")
+
+# Optional: Keep Cloudinary as fallback (but prioritize local storage)
 USE_CLOUDINARY = os.environ.get('USE_CLOUDINARY', 'False').lower() in ('true', '1', 't')
+USE_LOCAL_STORAGE = os.environ.get('USE_LOCAL_STORAGE', 'True').lower() in ('true', '1', 't')
 
-# Set media root directory first
-MEDIA_ROOT = BASE_DIR / 'media'
-os.makedirs(MEDIA_ROOT, exist_ok=True)
-
-if USE_CLOUDINARY:
+if USE_CLOUDINARY and not USE_LOCAL_STORAGE:
     try:
         import cloudinary
         import cloudinary.uploader

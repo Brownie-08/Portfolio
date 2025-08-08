@@ -152,6 +152,24 @@ class PersonalInfo(models.Model):
         return f"{self.full_name} - {self.portfolio_name}"
     
     def save(self, *args, **kwargs):
+        # Auto-delete old resume file when uploading a new one
+        if self.pk:  # Only for existing objects (updates)
+            try:
+                old_instance = PersonalInfo.objects.get(pk=self.pk)
+                if old_instance.resume and self.resume and old_instance.resume.name != self.resume.name:
+                    # Delete old resume file from storage
+                    import os
+                    if hasattr(old_instance.resume, 'path') and os.path.isfile(old_instance.resume.path):
+                        os.remove(old_instance.resume.path)
+                    else:
+                        # Try to delete using the storage backend
+                        old_instance.resume.delete(save=False)
+            except (PersonalInfo.DoesNotExist, ValueError, OSError) as e:
+                # Log the error but don't prevent saving
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"Could not delete old resume file: {e}")
+        
         # Clear cache when personal info is updated
         cache.delete('personal_info')
         super().save(*args, **kwargs)
