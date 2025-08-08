@@ -142,7 +142,7 @@ if 'debug_toolbar' in INSTALLED_APPS:
 # Remove debug middleware
 MIDDLEWARE = [middleware for middleware in MIDDLEWARE if 'debug_toolbar' not in middleware]
 
-# Media files configuration for Cloudinary
+# Media files configuration for Cloudinary with selective storage
 if config('USE_CLOUDINARY', default=False, cast=bool):
     try:
         import cloudinary
@@ -157,11 +157,17 @@ if config('USE_CLOUDINARY', default=False, cast=bool):
             secure=True  # Force HTTPS
         )
         
-        # Use Cloudinary for media files
-        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+        # Use selective storage: Cloudinary for images, local for resume files
+        DEFAULT_FILE_STORAGE = 'portfolio_project.storage.SelectiveCloudinaryStorage'
         
-        # Let Cloudinary handle the MEDIA_URL
-        MEDIA_URL = '/media/'  # This will be overridden by Cloudinary
+        # Media URL - Cloudinary will handle image URLs, local files use Django's media URL
+        MEDIA_URL = '/media/'
+        MEDIA_ROOT = BASE_DIR / 'media'
+        
+        # Ensure media directory exists for local files (resume, etc.)
+        import os
+        os.makedirs(MEDIA_ROOT, exist_ok=True)
+        
     except (ImportError, AttributeError) as e:
         print(f"Warning: Cloudinary configuration failed: {e}")
         # Fallback to local storage
