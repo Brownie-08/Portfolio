@@ -181,7 +181,15 @@ def resume_download_url(personal_info):
         except (ValueError, AttributeError, OSError) as e:
             logger.warning(f"Direct resume URL failed: {e}")
         
-        # Fallback to our custom serve_resume view (works with Railway persistent volume)
+        # Primary fallback: New production-ready resume view
+        try:
+            url = reverse('portfolio:latest_resume_download')
+            logger.info(f"Using latest_resume_download URL: {url}")
+            return url
+        except Exception as e:
+            logger.error(f"latest_resume_download URL failed: {e}")
+        
+        # Secondary fallback: Legacy serve_resume view
         try:
             url = reverse('portfolio:serve_resume')
             logger.info(f"Using serve_resume fallback URL: {url}")

@@ -22,10 +22,14 @@ urlpatterns = [
     # Contact page
     path('contact/', views.ContactView.as_view(), name='contact'),
     
-    # Media serving URLs (fallback for production)
+    # Direct resume serving (works on Railway production)
+    path('resume/latest/', views.latest_resume_view, name='latest_resume_view'),
+    path('resume/download/', views.latest_resume_download, name='latest_resume_download'),
+    
+    # Legacy media serving URLs (fallback)
     path('media-serve/<path:path>', media_views.serve_media, name='serve_media'),
     path('profile-image/', media_views.serve_profile_image, name='serve_profile_image'),
     path('resume-download/', media_views.serve_resume, name='serve_resume'),
-    path('download-resume/', media_views.serve_resume, name='download_resume'),  # Alternative URL
-    path('cv/', media_views.serve_resume, name='cv_download'),  # Alternative URL
+    path('download-resume/', media_views.serve_resume, name='download_resume'),
+    path('cv/', media_views.serve_resume, name='cv_download'),
 ]

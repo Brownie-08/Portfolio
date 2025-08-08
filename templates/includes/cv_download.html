@@ -34,37 +34,54 @@ Examples:
 {% endcomment %}
 
 {% if personal_info.resume %}
-    {% resume_download_url personal_info as resume_url %}
     {% if button_context == "navbar" %}
-        <li class="nav-item">
-            <a class="{{ button_class|default:'nav-link' }}" href="{{ resume_url }}" target="{{ target|default:'_blank' }}">
+        <li class="nav-item dropdown">
+            <a class="{{ button_class|default:'nav-link dropdown-toggle' }}" href="#" id="cvDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 {% if show_icon and icon_class %}
-                    <i class="{{ icon_class|default:'bi bi-download' }} me-1"></i>
+                    <i class="{{ icon_class|default:'bi bi-file-earmark-pdf' }} me-1"></i>
                 {% endif %}
-                {{ button_text|default:"CV" }}
+                {{ button_text|default:"Resume" }}
             </a>
+            <ul class="dropdown-menu" aria-labelledby="cvDropdown">
+                <li><a class="dropdown-item" href="{% url 'portfolio:latest_resume_view' %}" target="_blank">
+                    <i class="bi bi-eye me-2"></i>View Resume
+                </a></li>
+                <li><a class="dropdown-item" href="{% url 'portfolio:latest_resume_download' %}">
+                    <i class="bi bi-download me-2"></i>Download Resume
+                </a></li>
+            </ul>
         </li>
     {% elif button_context == "footer" %}
-        <a href="{{ resume_url }}" class="{{ button_class|default:'btn btn-outline-light btn-sm' }}" target="{{ target|default:'_blank' }}">
+        <a href="{% url 'portfolio:latest_resume_download' %}" class="{{ button_class|default:'btn btn-outline-light btn-sm' }}">
             {% if show_icon|default:True %}
                 <i class="{{ icon_class|default:'bi bi-download' }} me-1"></i>
             {% endif %}
             {{ button_text|default:"Download CV" }}
         </a>
     {% elif button_context == "cta" %}
-        <a href="{{ resume_url }}" class="{{ button_class|default:'btn btn-primary btn-lg' }}" target="{{ target|default:'_blank' }}">
-            {% if show_icon|default:True %}
-                <i class="{{ icon_class|default:'bi bi-download' }} me-1"></i>
-            {% endif %}
-            {{ button_text|default:"Download Resume" }}
-        </a>
+        <div class="btn-group" role="group">
+            <a href="{% url 'portfolio:latest_resume_view' %}" class="{{ button_class|default:'btn btn-primary btn-lg' }}" target="_blank">
+                {% if show_icon|default:True %}
+                    <i class="bi bi-eye me-1"></i>
+                {% endif %}
+                View Resume
+            </a>
+            <a href="{% url 'portfolio:latest_resume_download' %}" class="{{ button_class|default:'btn btn-outline-primary btn-lg' }}">
+                <i class="bi bi-download me-1"></i>
+                Download
+            </a>
+        </div>
     {% else %}
-        {% comment %}Default page context{% endcomment %}
-        <a href="{{ resume_url }}" class="{{ button_class|default:'btn btn-primary' }}" target="{{ target|default:'_blank' }}">
-            {% if show_icon|default:True %}
-                <i class="{{ icon_class|default:'bi bi-download' }} me-1"></i>
-            {% endif %}
-            {{ button_text|default:"Download Resume" }}
-        </a>
+        {% comment %}Default page context - Show both options{% endcomment %}
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{% url 'portfolio:latest_resume_view' %}" class="{{ button_class|default:'btn btn-outline-primary' }}" target="_blank">
+                <i class="bi bi-eye me-1"></i>
+                View Resume
+            </a>
+            <a href="{% url 'portfolio:latest_resume_download' %}" class="{{ button_class|default:'btn btn-primary' }}">
+                <i class="bi bi-download me-1"></i>
+                Download Resume
+            </a>
+        </div>
     {% endif %}
 {% endif %}
