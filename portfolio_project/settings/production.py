@@ -142,7 +142,7 @@ if 'debug_toolbar' in INSTALLED_APPS:
 # Remove debug middleware
 MIDDLEWARE = [middleware for middleware in MIDDLEWARE if 'debug_toolbar' not in middleware]
 
-# Media files configuration for Cloudinary with selective storage
+# Media files configuration for Cloudinary
 if config('USE_CLOUDINARY', default=False, cast=bool):
     try:
         import cloudinary
@@ -157,16 +157,19 @@ if config('USE_CLOUDINARY', default=False, cast=bool):
             secure=True  # Force HTTPS
         )
         
-        # Use selective storage: Cloudinary for images, local for resume files
-        DEFAULT_FILE_STORAGE = 'portfolio_project.storage.SelectiveCloudinaryStorage'
+        # For new uploads, use Cloudinary storage
+        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
         
-        # Media URL - Cloudinary will handle image URLs, local files use Django's media URL
+        # Media URL and Root for local files (resumes) and URL generation
         MEDIA_URL = '/media/'
         MEDIA_ROOT = BASE_DIR / 'media'
         
         # Ensure media directory exists for local files (resume, etc.)
         import os
         os.makedirs(MEDIA_ROOT, exist_ok=True)
+        
+        # Log successful Cloudinary setup
+        print(f"✓ Cloudinary configured with cloud: {config('CLOUDINARY_CLOUD_NAME')}")
         
     except (ImportError, AttributeError) as e:
         print(f"Warning: Cloudinary configuration failed: {e}")
@@ -185,6 +188,7 @@ else:
     MEDIA_ROOT = BASE_DIR / 'media'
     # Ensure media directory exists
     os.makedirs(MEDIA_ROOT, exist_ok=True)
+    print("Using local file storage (USE_CLOUDINARY=False)")
 
 # Keep STATICFILES_STORAGE pointed at WhiteNoise for static assets
 STATICFILES_STORAGE = "whitenoise.storage.StaticFilesStorage"
