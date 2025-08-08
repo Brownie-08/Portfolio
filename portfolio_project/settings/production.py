@@ -142,53 +142,17 @@ if 'debug_toolbar' in INSTALLED_APPS:
 # Remove debug middleware
 MIDDLEWARE = [middleware for middleware in MIDDLEWARE if 'debug_toolbar' not in middleware]
 
-# Media files configuration for Cloudinary
+# Cloudinary configuration for production
+# The base settings handle the Cloudinary setup automatically
+# Just ensure media directory exists for any local files
+import os
+os.makedirs(MEDIA_ROOT, exist_ok=True)
+
+# Log the storage being used
 if config('USE_CLOUDINARY', default=False, cast=bool):
-    try:
-        import cloudinary
-        import cloudinary.uploader
-        import cloudinary.api
-        
-        # Configure Cloudinary
-        cloudinary.config(
-            cloud_name=config('CLOUDINARY_CLOUD_NAME'),
-            api_key=config('CLOUDINARY_API_KEY'),
-            api_secret=config('CLOUDINARY_API_SECRET'),
-            secure=True  # Force HTTPS
-        )
-        
-        # For new uploads, use Cloudinary storage
-        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-        
-        # Media URL and Root for local files (resumes) and URL generation
-        MEDIA_URL = '/media/'
-        MEDIA_ROOT = BASE_DIR / 'media'
-        
-        # Ensure media directory exists for local files (resume, etc.)
-        import os
-        os.makedirs(MEDIA_ROOT, exist_ok=True)
-        
-        # Log successful Cloudinary setup
-        print(f"✓ Cloudinary configured with cloud: {config('CLOUDINARY_CLOUD_NAME')}")
-        
-    except (ImportError, AttributeError) as e:
-        print(f"Warning: Cloudinary configuration failed: {e}")
-        # Fallback to local storage
-        import os
-        DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-        MEDIA_URL = '/media/'
-        MEDIA_ROOT = BASE_DIR / 'media'
-        os.makedirs(MEDIA_ROOT, exist_ok=True)
+    print(f"✓ Production using Cloudinary: {config('CLOUDINARY_CLOUD_NAME')}")
 else:
-    import os
-    # Use default Django file storage for media files
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-    # Media files settings
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = BASE_DIR / 'media'
-    # Ensure media directory exists
-    os.makedirs(MEDIA_ROOT, exist_ok=True)
-    print("Using local file storage (USE_CLOUDINARY=False)")
+    print("Production using local file storage")
 
 # Keep STATICFILES_STORAGE pointed at WhiteNoise for static assets
 STATICFILES_STORAGE = "whitenoise.storage.StaticFilesStorage"

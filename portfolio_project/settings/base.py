@@ -129,7 +129,33 @@ STATICFILES_FINDERS = [
 ]
 
 
-# Media files
+# Cloudinary configuration
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+# Cloudinary credentials
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': env('CLOUDINARY_CLOUD_NAME', default=''),
+    'API_KEY': env('CLOUDINARY_API_KEY', default=''),
+    'API_SECRET': env('CLOUDINARY_API_SECRET', default=''),
+}
+
+# Configure Cloudinary when enabled
+if env.bool('USE_CLOUDINARY', default=False) and CLOUDINARY_STORAGE['CLOUD_NAME']:
+    # Configure Cloudinary
+    cloudinary.config(
+        cloud_name=CLOUDINARY_STORAGE['CLOUD_NAME'],
+        api_key=CLOUDINARY_STORAGE['API_KEY'],
+        api_secret=CLOUDINARY_STORAGE['API_SECRET'],
+        secure=True
+    )
+    # Use Cloudinary for media uploads
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+else:
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+# Media files - Cloudinary will handle URLs automatically
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
