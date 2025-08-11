@@ -26,9 +26,9 @@ Required Railway environment variables now include:
 ```env
 USE_CLOUDINARY=True
 USE_LOCAL_STORAGE=False  # ← This was missing before
-CLOUDINARY_CLOUD_NAME=de9i7id2b
-CLOUDINARY_API_KEY=547248818221456
-CLOUDINARY_API_SECRET=611drBROvgh5Bkip4HZYaLRoddI
+CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
+CLOUDINARY_API_KEY=your-cloudinary-api-key
+CLOUDINARY_API_SECRET=your-cloudinary-api-secret
 ```
 
 ### 🧪 Testing

@@ -37,7 +37,7 @@ git push origin main
 In your Railway project, go to **Variables** tab and add these:
 
 ```env
-SECRET_KEY=$jEz6MT0T%Vx$DAu#uXLY#*08s^NnF$=+m^q4O&%fAZ@Na0OXc
+SECRET_KEY=your-secure-django-secret-key-here
 DEBUG=False
 DJANGO_SETTINGS_MODULE=portfolio_project.settings.railway
 ALLOWED_HOSTS=*
@@ -46,19 +46,19 @@ ALLOWED_HOSTS=*
 # BOTH variables required - this fixes admin dashboard image uploads
 USE_CLOUDINARY=True
 USE_LOCAL_STORAGE=False
-CLOUDINARY_CLOUD_NAME=de9i7id2b
-CLOUDINARY_API_KEY=547248818221456
-CLOUDINARY_API_SECRET=611drBROvgh5Bkip4HZYaLRoddI
+CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
+CLOUDINARY_API_KEY=your-cloudinary-api-key
+CLOUDINARY_API_SECRET=your-cloudinary-api-secret
 
 # Email Configuration
 EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
 EMAIL_HOST=smtp.mail.yahoo.com
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
-EMAIL_HOST_USER=emmanuelmikebrown242@yahoo.com
-EMAIL_HOST_PASSWORD=faaoisrkfdlbtgaf
-DEFAULT_FROM_EMAIL=emmanuelmikebrown242@yahoo.com
-CONTACT_EMAIL=emmanuelmikebrown242@yahoo.com
+EMAIL_HOST_USER=your-email@yahoo.com
+EMAIL_HOST_PASSWORD=your-app-password-here
+DEFAULT_FROM_EMAIL=your-email@yahoo.com
+CONTACT_EMAIL=your-email@yahoo.com
 SEND_AUTO_REPLY=True
 ADMIN_EMAIL_SUBJECT_PREFIX=[Portfolio Contact] 
 
@@ -69,7 +69,12 @@ SESSION_COOKIE_SECURE=True
 CSRF_COOKIE_SECURE=True
 ```
 
-**Important:** The `DATABASE_URL` will be automatically set by Railway's MySQL plugin.
+**Important:** 
+- The `DATABASE_URL` will be automatically set by Railway's MySQL plugin
+- Replace placeholder values with your actual credentials:
+  - Get Cloudinary credentials from your [Cloudinary Dashboard](https://cloudinary.com/console)
+  - Use a secure Django secret key (generate one at [djecrety.ir](https://djecrety.ir/))
+  - Use your actual email credentials for SMTP configuration
 
 ### **Step 4: Deploy**
 1. Railway will automatically deploy when you push to GitHub
