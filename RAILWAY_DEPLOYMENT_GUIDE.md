@@ -39,18 +39,26 @@ In your Railway project, go to **Variables** tab and add these:
 ```env
 SECRET_KEY=$jEz6MT0T%Vx$DAu#uXLY#*08s^NnF$=+m^q4O&%fAZ@Na0OXc
 DEBUG=False
-DJANGO_SETTINGS_MODULE=portfolio_project.settings.production
+DJANGO_SETTINGS_MODULE=portfolio_project.settings.railway
 ALLOWED_HOSTS=*
+
+# 🖼️ CLOUDINARY CONFIGURATION (CRITICAL FOR IMAGE UPLOADS)
+# BOTH variables required - this fixes admin dashboard image uploads
+USE_CLOUDINARY=True
+USE_LOCAL_STORAGE=False
+CLOUDINARY_CLOUD_NAME=de9i7id2b
+CLOUDINARY_API_KEY=547248818221456
+CLOUDINARY_API_SECRET=611drBROvgh5Bkip4HZYaLRoddI
 
 # Email Configuration
 EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
-EMAIL_HOST=smtp.gmail.com
+EMAIL_HOST=smtp.mail.yahoo.com
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
-EMAIL_HOST_USER=your-email@gmail.com
-EMAIL_HOST_PASSWORD=your-16-character-app-password
-DEFAULT_FROM_EMAIL=your-email@gmail.com
-CONTACT_EMAIL=your-email@gmail.com
+EMAIL_HOST_USER=emmanuelmikebrown242@yahoo.com
+EMAIL_HOST_PASSWORD=faaoisrkfdlbtgaf
+DEFAULT_FROM_EMAIL=emmanuelmikebrown242@yahoo.com
+CONTACT_EMAIL=emmanuelmikebrown242@yahoo.com
 SEND_AUTO_REPLY=True
 ADMIN_EMAIL_SUBJECT_PREFIX=[Portfolio Contact] 
 
@@ -101,6 +109,25 @@ Visit your Railway URL (found in project dashboard) and verify:
 2. Check your Gmail for notification
 3. Verify auto-reply was sent
 4. Check dashboard for new message
+
+### **🖼️ Image Upload Testing (CRITICAL)**
+**This deployment fixes the broken image upload issue!**
+
+1. **Login to Admin Dashboard**: `/dashboard/login/`
+2. **Upload Test Image**: 
+   - Go to Projects → Add New Project
+   - Upload a project image
+   - Save the project
+3. **Verify Cloudinary Storage**:
+   - Image URL should contain `res.cloudinary.com`
+   - Image displays correctly immediately
+   - Image persists after Railway redeployment
+4. **Test Persistence**:
+   - Wait for automatic redeployment or trigger one
+   - Verify uploaded images still display (they will!)
+
+**Before this fix**: Images disappeared after redeployment  
+**After this fix**: Images stored on Cloudinary and persist forever ✅
 
 ---
 
