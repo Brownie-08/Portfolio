@@ -33,23 +33,21 @@ urlpatterns = [
     path('', include('portfolio.urls')),
 ]
 
-# Serve media files - different handling for development vs production
-if settings.DEBUG:
-    # In development, serve media files directly
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-else:
-    # In production, still serve media files if using local storage as fallback
-    # This is handled by WhiteNoise middleware or cloud storage
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# IMPORTANT: DO NOT serve media files locally in production
+# When using Cloudinary, Django should never serve /media/ URLs
+# Cloudinary handles all image URLs directly
 
-# Serve static files - always include for fallback
-# WhiteNoise middleware should handle this in production, but include as fallback
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
-# Debug Toolbar URLs (development only)
 if settings.DEBUG:
+    # Only serve media files in development
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    
+    # Debug Toolbar URLs (development only)
     try:
         import debug_toolbar
         urlpatterns = [path('__debug__/', include(debug_toolbar.urls))] + urlpatterns
     except ImportError:
         pass
+
+# Static files - always include for fallback
+# WhiteNoise middleware handles this in production, but include as fallback
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

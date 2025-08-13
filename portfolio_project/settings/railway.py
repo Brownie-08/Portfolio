@@ -74,8 +74,7 @@ if not SECRET_KEY:
     SECRET_KEY = 'django-insecure-railway-deployment-temp-key-replace-with-secure-key-12345678901234567890'
     print("Warning: Using temporary SECRET_KEY. Set DJANGO_SECRET_KEY or SECRET_KEY environment variable.")
 
-# Override the django-environ base setting that expects SECRET_KEY to be set
-# This prevents ImportError during Railway startup
+# Override the django-environ base setting that prevents ImportError
 os.environ.setdefault('DJANGO_SECRET_KEY', SECRET_KEY)
 
 # Email configuration
@@ -141,87 +140,72 @@ STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
 WHITENOISE_USE_FINDERS = False
 WHITENOISE_AUTOREFRESH = False
 
-# Media files configuration for Railway Persistent Volume
-# Railway persistent volume should be mounted to /app/media
-if os.path.exists('/app/media'):
-    # Production: Use Railway persistent volume
-    MEDIA_ROOT = '/app/media'
-    print("Using Railway persistent volume for media files")
-else:
-    # Development: Use local media directory
-    MEDIA_ROOT = BASE_DIR / 'media'
-    os.makedirs(MEDIA_ROOT, exist_ok=True)
-    print("Using local media directory")
+# ===== CRITICAL MEDIA FILES CONFIGURATION =====
+# Force Cloudinary usage in production - NO FALLBACKS
 
-MEDIA_URL = '/media/'
+# Cloudinary is REQUIRED for Railway production
+# Check for required Cloudinary environment variables
+CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME')
+CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY')  
+CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET')
 
-# Use Django default file storage (local/Railway persistent volume)
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-print(f"Using local/Railway media storage: {MEDIA_ROOT}")
+if not all([CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET]):
+    raise ValueError(
+        "Cloudinary credentials are required for Railway deployment. "
+        "Please set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET "
+        "in Railway environment variables."
+    )
 
-# Optional: Keep Cloudinary as fallback (but prioritize local storage)
-USE_CLOUDINARY = os.environ.get('USE_CLOUDINARY', 'False').lower() in ('true', '1', 't')
-USE_LOCAL_STORAGE = os.environ.get('USE_LOCAL_STORAGE', 'True').lower() in ('true', '1', 't')
-
-if USE_CLOUDINARY and not USE_LOCAL_STORAGE:
-    try:
-        import cloudinary
-        import cloudinary.uploader
-        import cloudinary.api
-        
-        # Configure Cloudinary with proper settings for public access
-        cloudinary.config(
-            cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
-            api_key=os.environ.get('CLOUDINARY_API_KEY'),
-            api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
-            secure=True,
-            # Force public access for all uploads
-            default_upload_options={
-                'resource_type': 'auto',  # Auto-detect file type
-                'type': 'upload',         # Standard upload type
-                'access_mode': 'public',  # Ensure public access
-                'invalidate': True,       # Clear cache for updated files
-            }
-        )
-        
-        # Use Cloudinary for media files
-        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-        MEDIA_URL = '/media/'
-        
-        # Cloudinary-specific settings for better file handling
-        CLOUDINARY_STORAGE = {
-            'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
-            'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
-            'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
-            'SECURE': True,
-            'MEDIA_TAG': 'media',
-            'INVALID_VIDEO_ERROR_MESSAGE': 'Please upload a valid video file.',
-            'EXCLUDE_DELETE_ORPHANED_MEDIA_PATHS': (),
-            'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpe', 'jpeg', 'jpc', 'jp2', 'j2k', 'wdp', 'jxr', 'hdp', 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff'],
-            'STATICFILES_MANIFEST_ROOT': os.path.join(BASE_DIR, 'manifest'),
-            'DEFAULT_FILE_STORAGE': 'cloudinary_storage.storage.MediaCloudinaryStorage',
-            'OPTIONS': {
-                'resource_type': 'auto',
-                'type': 'upload',
-                'access_mode': 'public',
-                'format': 'auto',
-                'quality': 'auto:good',
-                'fetch_format': 'auto',
-            }
+# Configure Cloudinary with secure settings
+try:
+    import cloudinary
+    import cloudinary.uploader
+    import cloudinary.api
+    
+    cloudinary.config(
+        cloud_name=CLOUDINARY_CLOUD_NAME,
+        api_key=CLOUDINARY_API_KEY,
+        api_secret=CLOUDINARY_API_SECRET,
+        secure=True,  # Force HTTPS
+    )
+    
+    # Use Cloudinary for all media files
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    
+    # Cloudinary-specific settings
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
+        'API_KEY': CLOUDINARY_API_KEY,
+        'API_SECRET': CLOUDINARY_API_SECRET,
+        'SECURE': True,
+        'MEDIA_TAG': 'media',
+        'INVALID_VIDEO_ERROR_MESSAGE': 'Please upload a valid video file.',
+        'EXCLUDE_DELETE_ORPHANED_MEDIA_PATHS': (),
+        'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpe', 'jpeg', 'jpc', 'jp2', 'j2k', 'wdp', 'jxr', 'hdp', 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff'],
+        'STATICFILES_MANIFEST_ROOT': os.path.join(BASE_DIR, 'manifest'),
+        'DEFAULT_FILE_STORAGE': 'cloudinary_storage.storage.MediaCloudinaryStorage',
+        'OPTIONS': {
+            'resource_type': 'auto',
+            'type': 'upload', 
+            'access_mode': 'public',
+            'format': 'auto',
+            'quality': 'auto:good',
+            'fetch_format': 'auto',
         }
-        
-        print("Using Cloudinary for media storage with public access")
-    except (ImportError, AttributeError) as e:
-        print(f"Warning: Cloudinary configuration failed: {e}")
-        # Fallback to local storage
-        DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-        MEDIA_URL = '/media/'
-        print("Falling back to local media storage")
-else:
-    # Use default Django file storage
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-    MEDIA_URL = '/media/'
-    print("Using local media storage")
+    }
+    
+    # IMPORTANT: NO MEDIA_URL or MEDIA_ROOT for Cloudinary
+    # Let Cloudinary handle all URL generation
+    # Disable local media completely in production
+    print("✅ Cloudinary configured successfully for Railway production")
+    
+except ImportError as e:
+    raise ImportError(
+        f"Cloudinary packages are required for Railway deployment: {e}. "
+        "Install with: pip install cloudinary django-cloudinary-storage"
+    )
+except Exception as e:
+    raise Exception(f"Failed to configure Cloudinary: {e}")
 
 # Logging configuration for Railway (console only)
 LOGGING = {
@@ -259,6 +243,11 @@ LOGGING = {
             'level': os.environ.get('APP_LOG_LEVEL', 'INFO'),
             'propagate': False,
         },
+        'cloudinary': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
     },
 }
 
@@ -281,6 +270,3 @@ SERVER_EMAIL = os.environ.get('SERVER_EMAIL', DEFAULT_FROM_EMAIL)
 # Data upload settings
 DATA_UPLOAD_MAX_MEMORY_SIZE = int(os.environ.get('DATA_UPLOAD_MAX_MEMORY_SIZE', 5242880))  # 5MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = int(os.environ.get('FILE_UPLOAD_MAX_MEMORY_SIZE', 5242880))  # 5MB
-
-# Note: SSL settings are configured above based on environment variables
-# Remove this override to avoid conflicts during initial deployment
