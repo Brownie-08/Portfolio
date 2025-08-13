@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.core.cache import cache
+from portfolio_project.storages import PublicPDFStorage
 
 
 class Tag(models.Model):
@@ -132,8 +133,13 @@ class PersonalInfo(models.Model):
     website_url = models.URLField(blank=True)
     instagram_url = models.URLField(blank=True)
     
-    # Resume/CV
-    resume = models.FileField(upload_to='files/', blank=True)
+    # Resume/CV - Uses custom storage for proper PDF handling
+    resume = models.FileField(
+        storage=PublicPDFStorage(),
+        upload_to='files/',
+        blank=True,
+        help_text="Upload your resume/CV (PDF, DOC, DOCX). Will be publicly accessible for download."
+    )
     
     # SEO fields
     meta_description = models.CharField(max_length=160, blank=True, help_text="SEO meta description for homepage")
