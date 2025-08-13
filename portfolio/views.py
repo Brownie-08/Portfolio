@@ -409,19 +409,28 @@ import os
 def latest_resume_view(request):
     """
     Open the latest resume in the browser if supported (PDF viewer).
-    Works on Railway production without additional server config.
+    Works with both Cloudinary and local storage.
     """
+    from django.shortcuts import redirect
+    
     try:
         personal_info = PersonalInfo.get_active()
-        if personal_info and personal_info.resume and os.path.exists(personal_info.resume.path):
-            response = FileResponse(
-                open(personal_info.resume.path, 'rb'), 
-                as_attachment=False,  # Open in browser
-                content_type='application/pdf'
-            )
-            # Add cache headers for better performance
-            response['Cache-Control'] = 'public, max-age=3600'
-            return response
+        if personal_info and personal_info.resume:
+            # For Cloudinary storage, redirect to the direct URL
+            if 'cloudinary' in settings.DEFAULT_FILE_STORAGE.lower():
+                url = personal_info.resume.url
+                return redirect(url)
+            
+            # For local storage, serve the file directly
+            elif os.path.exists(personal_info.resume.path):
+                response = FileResponse(
+                    open(personal_info.resume.path, 'rb'), 
+                    as_attachment=False,  # Open in browser
+                    content_type='application/pdf'
+                )
+                # Add cache headers for better performance
+                response['Cache-Control'] = 'public, max-age=3600'
+                return response
     except Exception as e:
         # Log error but don't expose details
         import logging
@@ -433,24 +442,39 @@ def latest_resume_view(request):
 def latest_resume_download(request):
     """
     Force download of the latest resume.
-    Works on Railway production without additional server config.
+    Works with both Cloudinary and local storage.
     """
+    from django.shortcuts import redirect
+    from django.http import HttpResponse
+    
     try:
         personal_info = PersonalInfo.get_active()
-        if personal_info and personal_info.resume and os.path.exists(personal_info.resume.path):
-            filename = os.path.basename(personal_info.resume.name)
-            if not filename:
-                filename = "resume.pdf"
+        if personal_info and personal_info.resume:
+            # For Cloudinary storage, redirect to the direct URL with download parameters
+            if 'cloudinary' in settings.DEFAULT_FILE_STORAGE.lower():
+                url = personal_info.resume.url
+                # Add download parameter to force download
+                if '?' in url:
+                    url += '&fl_attachment'
+                else:
+                    url += '?fl_attachment'
+                return redirect(url)
             
-            response = FileResponse(
-                open(personal_info.resume.path, 'rb'), 
-                as_attachment=True,  # Force download
-                filename=filename,
-                content_type='application/pdf'
-            )
-            # Add cache headers for better performance
-            response['Cache-Control'] = 'public, max-age=3600'
-            return response
+            # For local storage, serve the file directly
+            elif os.path.exists(personal_info.resume.path):
+                filename = os.path.basename(personal_info.resume.name)
+                if not filename:
+                    filename = "resume.pdf"
+                
+                response = FileResponse(
+                    open(personal_info.resume.path, 'rb'), 
+                    as_attachment=True,  # Force download
+                    filename=filename,
+                    content_type='application/pdf'
+                )
+                # Add cache headers for better performance
+                response['Cache-Control'] = 'public, max-age=3600'
+                return response
     except Exception as e:
         # Log error but don't expose details
         import logging

@@ -185,9 +185,9 @@ try:
         'STATICFILES_MANIFEST_ROOT': os.path.join(BASE_DIR, 'manifest'),
         'DEFAULT_FILE_STORAGE': 'cloudinary_storage.storage.MediaCloudinaryStorage',
         'OPTIONS': {
-            'resource_type': 'auto',
+            'resource_type': 'auto',  # Auto-detects images vs raw files
             'type': 'upload', 
-            'access_mode': 'public',
+            'access_mode': 'public',  # Ensures public access for all files
             'format': 'auto',
             'quality': 'auto:good',
             'fetch_format': 'auto',
