@@ -13,7 +13,7 @@ import os
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY') or os.environ.get('SECRET_KEY')
 if not SECRET_KEY:
     SECRET_KEY = 'django-insecure-railway-deployment-temp-key-replace-with-secure-key-12345678901234567890'
-    print("Warning: Using temporary SECRET_KEY. Set DJANGO_SECRET_KEY or SECRET_KEY environment variable.")
+    print("⚠️  Warning: Using temporary SECRET_KEY. Set DJANGO_SECRET_KEY environment variable in Railway.")
 
 # Ensure environment variables are set before base.py imports
 os.environ.setdefault('DJANGO_SECRET_KEY', SECRET_KEY)
