@@ -140,10 +140,14 @@ STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
 WHITENOISE_USE_FINDERS = False
 WHITENOISE_AUTOREFRESH = False
 
-# ===== CRITICAL MEDIA FILES CONFIGURATION =====
-# Force Cloudinary usage in production - NO FALLBACKS
+# ===== MEDIA FILES CONFIGURATION FOR RAILWAY =====
+# Mixed approach: Images on Cloudinary, Resumes on Railway volume
 
-# Cloudinary is REQUIRED for Railway production
+# Media files configuration for Railway volume (resumes/PDFs)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Cloudinary for images only
 # Check for required Cloudinary environment variables
 CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME')
 CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY')  

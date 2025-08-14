@@ -2,7 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.core.cache import cache
-from portfolio_project.storages import PublicPDFStorage
+from portfolio_project.storages import PublicPDFStorage, ResumeStorage
 
 
 class Tag(models.Model):
@@ -133,12 +133,12 @@ class PersonalInfo(models.Model):
     website_url = models.URLField(blank=True)
     instagram_url = models.URLField(blank=True)
     
-    # Resume/CV - Uses custom storage for proper PDF handling
+    # Resume/CV - Uses Railway volume storage for better file serving
     resume = models.FileField(
-        storage=PublicPDFStorage(),
-        upload_to='files/',
+        storage=ResumeStorage(),
+        upload_to='resumes/',
         blank=True,
-        help_text="Upload your resume/CV (PDF, DOC, DOCX). Will be publicly accessible for download."
+        help_text="Upload your resume/CV (PDF, DOC, DOCX). Stored on Railway volume for reliable access."
     )
     
     # SEO fields

@@ -33,12 +33,12 @@ urlpatterns = [
     path('', include('portfolio.urls')),
 ]
 
-# IMPORTANT: DO NOT serve media files locally in production
-# When using Cloudinary, Django should never serve /media/ URLs
-# Cloudinary handles all image URLs directly
+# Media files handling:
+# - Development: Django serves from local MEDIA_ROOT
+# - Production: Railway static assets serve from volume + Cloudinary for images
 
 if settings.DEBUG:
-    # Only serve media files in development
+    # Serve media files in development
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     
     # Debug Toolbar URLs (development only)
