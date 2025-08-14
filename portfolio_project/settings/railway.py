@@ -79,13 +79,20 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 # ✅ Database config from Railway
+# Railway provides DATABASE_URL automatically, fallback to SQLite for local dev
+DATABASE_URL = os.environ.get('DATABASE_URL')
+print(f"📊 DATABASE_URL detected: {'Yes (Postgres)' if DATABASE_URL and 'postgresql' in DATABASE_URL else 'No (using SQLite fallback)'}")
+
 DATABASES = {
     "default": dj_database_url.config(
-        default=os.getenv("DATABASE_URL"),
+        default=f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}",
         conn_max_age=600,
-        ssl_require=True,
+        ssl_require=False,  # Railway handles SSL automatically
     )
 }
+
+# Debug: Print database engine being used
+print(f"🔗 Database ENGINE: {DATABASES['default'].get('ENGINE', 'Not configured')}")
 
 # ✅ Static files (served via WhiteNoise)
 STATIC_URL = "/static/"
