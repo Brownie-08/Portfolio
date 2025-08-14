@@ -2,7 +2,15 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.core.cache import cache
-from portfolio_project.storages import PublicPDFStorage, ResumeStorage
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+import os
+
+# Local storage for resume files (served directly by Railway/Django)
+resume_storage = FileSystemStorage(
+    location=getattr(settings, 'MEDIA_ROOT', os.path.join(settings.BASE_DIR, 'media')),
+    base_url=getattr(settings, 'MEDIA_URL', '/media/')
+)
 
 
 class Tag(models.Model):
@@ -133,12 +141,12 @@ class PersonalInfo(models.Model):
     website_url = models.URLField(blank=True)
     instagram_url = models.URLField(blank=True)
     
-    # Resume/CV - Uses Railway volume storage for better file serving
+    # Resume/CV - Uses local storage (served directly by Railway)
     resume = models.FileField(
-        storage=ResumeStorage(),
+        storage=resume_storage,
         upload_to='resumes/',
         blank=True,
-        help_text="Upload your resume/CV (PDF, DOC, DOCX). Stored on Railway volume for reliable access."
+        help_text="Upload your resume/CV (PDF, DOC, DOCX). Served directly from /media/ path."
     )
     
     # SEO fields

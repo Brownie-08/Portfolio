@@ -141,13 +141,13 @@ WHITENOISE_USE_FINDERS = False
 WHITENOISE_AUTOREFRESH = False
 
 # ===== MEDIA FILES CONFIGURATION FOR RAILWAY =====
-# Mixed approach: Images on Cloudinary, Resumes on Railway volume
+# Clean approach: Cloudinary for images + local storage for resumes
 
-# Media files configuration for Railway volume (resumes/PDFs)
+# Local storage for resumes/PDFs
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Cloudinary for images only
+# Cloudinary for images (DEFAULT_FILE_STORAGE)
 # Check for required Cloudinary environment variables
 CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME')
 CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY')  
