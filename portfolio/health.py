@@ -74,4 +74,16 @@ def simple_health_check(request):
     For Railway deployment health check
     """
     from django.http import HttpResponse
-    return HttpResponse("OK", status=200, content_type="text/plain")
+    from django.conf import settings
+    import os
+    
+    # Add debug info in response headers for troubleshooting
+    response = HttpResponse("OK", status=200, content_type="text/plain")
+    
+    # Add debugging headers (remove in final production)
+    if settings.DEBUG or os.environ.get('RAILWAY_DEBUG_HEADERS') == 'True':
+        response['X-Debug-Allowed-Hosts'] = str(settings.ALLOWED_HOSTS)
+        response['X-Debug-Railway-Domain'] = os.environ.get('RAILWAY_PUBLIC_DOMAIN', 'Not set')
+        response['X-Debug-Host-Header'] = request.META.get('HTTP_HOST', 'Not set')
+    
+    return response

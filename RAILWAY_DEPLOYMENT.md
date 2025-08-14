@@ -1,19 +1,36 @@
-# Railway Production Deployment Guide
+# Railway Deployment Guide - Production Health Fix
 
-## 🚀 Your Portfolio is Now Live!
+## ✅ **Environment Variables to Set in Railway**
 
-Your Django portfolio has been successfully deployed to Railway. Here's what happens during deployment and how to manage your content:
+Set these environment variables in your Railway dashboard:
 
-## 📦 Automated Build Process
+### **Required for Production**
+```bash
+DEBUG=False
+DJANGO_SECRET_KEY=your-super-secret-key-here-min-50-chars-long-and-random
+RAILWAY_PUBLIC_DOMAIN=your-app-name.up.railway.app
+```
 
-The Railway deployment automatically:
+### **Optional for Enhanced Features**
+```bash
+# Cloudinary (for image hosting)
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
 
-1. **Installs dependencies** from `requirements.txt`
-2. **Collects static files** (CSS, JS, images)
-3. **Runs database migrations** to create all tables
-4. **Seeds the database** with sample portfolio data
-5. **Sets up media directories** for file uploads
-6. **Starts the Django application** with Gunicorn
+# Debugging (temporary)
+RAILWAY_DEBUG_HEADERS=True
+```
+
+## 🚀 **Railway Configuration Status**
+
+Your app is configured to:
+- ✅ Use PostgreSQL database (automatically provided by Railway)
+- ✅ Load development data via fixtures (`data.json`)
+- ✅ Handle CSRF properly with Railway domains
+- ✅ Serve static files via WhiteNoise
+- ✅ Support resume uploads to local `/media/` storage
+- ✅ Support image hosting via Cloudinary (optional)
 
 ## 🎯 What's Included in Sample Data
 

@@ -72,28 +72,45 @@ if not SECRET_KEY:
     SECRET_KEY = 'django-insecure-railway-deployment-temp-key-replace-with-secure-key-12345678901234567890'
     print("Warning: Using temporary SECRET_KEY. Set DJANGO_SECRET_KEY environment variable in Railway.")
 
-# Debug mode - TEMPORARILY ENABLED FOR DEBUGGING
-DEBUG = True
+# Debug mode - Use environment variable for production control
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-# Railway domain configuration
-# Get Railway domain from environment or use wildcard for debugging
-RAILWAY_DOMAIN = os.environ.get('RAILWAY_PUBLIC_DOMAIN')
+# Railway domain configuration for production
+RAILWAY_DOMAIN = os.environ.get("RAILWAY_PUBLIC_DOMAIN", "")
+
+# ALLOWED_HOSTS configuration
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 if RAILWAY_DOMAIN:
-    ALLOWED_HOSTS = [RAILWAY_DOMAIN, 'localhost', '127.0.0.1']
+    ALLOWED_HOSTS.append(RAILWAY_DOMAIN)
+    # Also add the full Railway domain format
+    if not RAILWAY_DOMAIN.endswith(".railway.app"):
+        ALLOWED_HOSTS.append(f"{RAILWAY_DOMAIN}.up.railway.app")
 else:
-    # Fallback for debugging - replace with actual domain in production
-    ALLOWED_HOSTS = ['*']  # Temporary wildcard for debugging
+    # Development fallback or when domain not set
+    ALLOWED_HOSTS.append("*")
 
 # CSRF trusted origins for Railway
 CSRF_TRUSTED_ORIGINS = []
 if RAILWAY_DOMAIN:
-    CSRF_TRUSTED_ORIGINS = [f'https://{RAILWAY_DOMAIN}']
-else:
-    # Common Railway domain patterns - update with your actual domain
     CSRF_TRUSTED_ORIGINS = [
-        'https://portfolio-production-*.up.railway.app',
-        'https://*.railway.app',
+        f"https://{RAILWAY_DOMAIN}",
     ]
+    # Also add the full Railway domain format for CSRF
+    if not RAILWAY_DOMAIN.endswith(".railway.app"):
+        CSRF_TRUSTED_ORIGINS.append(f"https://{RAILWAY_DOMAIN}.up.railway.app")
+else:
+    # Development or fallback - allow common Railway patterns
+    CSRF_TRUSTED_ORIGINS = [
+        "https://*.up.railway.app",
+        "https://*.railway.app",
+    ]
+
+# Debug output for Railway configuration
+print(f"🚀 Railway Configuration:")
+print(f"   DEBUG: {DEBUG}")
+print(f"   RAILWAY_DOMAIN: {RAILWAY_DOMAIN or 'Not set'}")
+print(f"   ALLOWED_HOSTS: {ALLOWED_HOSTS}")
+print(f"   CSRF_TRUSTED_ORIGINS: {CSRF_TRUSTED_ORIGINS}")
 
 # ✅ Database config from Railway
 # Railway provides DATABASE_URL automatically, fallback to SQLite for local dev
