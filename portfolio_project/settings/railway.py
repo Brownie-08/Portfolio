@@ -11,9 +11,60 @@ from pathlib import Path
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# Import base app configuration
-from .base import INSTALLED_APPS, ROOT_URLCONF, WSGI_APPLICATION, AUTH_PASSWORD_VALIDATORS
-from .base import LANGUAGE_CODE, TIME_ZONE, USE_I18N, USE_TZ, DEFAULT_AUTO_FIELD
+# Core Django Applications
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.sitemaps",
+    # Third-party apps
+    "crispy_forms",
+    "crispy_bootstrap5",
+    # Local apps
+    "portfolio",
+    "dashboard",
+]
+
+# Only add Cloudinary apps if available
+try:
+    import cloudinary
+    import cloudinary_storage
+    INSTALLED_APPS.insert(-2, "cloudinary_storage")
+    INSTALLED_APPS.insert(-2, "cloudinary")
+except ImportError:
+    pass
+
+# Django Configuration
+ROOT_URLCONF = "portfolio_project.urls"
+WSGI_APPLICATION = "portfolio_project.wsgi.application"
+
+# Internationalization
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "UTC"
+USE_I18N = True
+USE_TZ = True
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Password validation
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    },
+]
 
 # Secret key
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY') or os.environ.get('SECRET_KEY')
@@ -21,11 +72,11 @@ if not SECRET_KEY:
     SECRET_KEY = 'django-insecure-railway-deployment-temp-key-replace-with-secure-key-12345678901234567890'
     print("⚠️  Warning: Using temporary SECRET_KEY. Set DJANGO_SECRET_KEY environment variable in Railway.")
 
-# Debug mode
-DEBUG = False
+# Debug mode - TEMPORARILY ENABLED FOR DEBUGGING
+DEBUG = True
 
-# ✅ Allow Railway domain + wildcard
-ALLOWED_HOSTS = ["*", ".railway.app", "localhost", "127.0.0.1"]
+# ✅ Allow Railway domain + wildcard - WILDCARD FOR DEBUGGING
+ALLOWED_HOSTS = ['*']
 
 # ✅ Database config from Railway
 DATABASES = {
@@ -39,6 +90,9 @@ DATABASES = {
 # ✅ Static files (served via WhiteNoise)
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -104,3 +158,12 @@ if all([CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET]):
 else:
     print("⚠️  Cloudinary credentials not found, using local storage")
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+# Crispy Forms Configuration
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+# Disable security settings for debugging
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
