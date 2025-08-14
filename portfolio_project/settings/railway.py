@@ -70,13 +70,30 @@ AUTH_PASSWORD_VALIDATORS = [
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY') or os.environ.get('SECRET_KEY')
 if not SECRET_KEY:
     SECRET_KEY = 'django-insecure-railway-deployment-temp-key-replace-with-secure-key-12345678901234567890'
-    print("⚠️  Warning: Using temporary SECRET_KEY. Set DJANGO_SECRET_KEY environment variable in Railway.")
+    print("Warning: Using temporary SECRET_KEY. Set DJANGO_SECRET_KEY environment variable in Railway.")
 
 # Debug mode - TEMPORARILY ENABLED FOR DEBUGGING
 DEBUG = True
 
-# ✅ Allow Railway domain + wildcard - WILDCARD FOR DEBUGGING
-ALLOWED_HOSTS = ['*']
+# Railway domain configuration
+# Get Railway domain from environment or use wildcard for debugging
+RAILWAY_DOMAIN = os.environ.get('RAILWAY_PUBLIC_DOMAIN')
+if RAILWAY_DOMAIN:
+    ALLOWED_HOSTS = [RAILWAY_DOMAIN, 'localhost', '127.0.0.1']
+else:
+    # Fallback for debugging - replace with actual domain in production
+    ALLOWED_HOSTS = ['*']  # Temporary wildcard for debugging
+
+# CSRF trusted origins for Railway
+CSRF_TRUSTED_ORIGINS = []
+if RAILWAY_DOMAIN:
+    CSRF_TRUSTED_ORIGINS = [f'https://{RAILWAY_DOMAIN}']
+else:
+    # Common Railway domain patterns - update with your actual domain
+    CSRF_TRUSTED_ORIGINS = [
+        'https://portfolio-production-*.up.railway.app',
+        'https://*.railway.app',
+    ]
 
 # ✅ Database config from Railway
 # Railway provides DATABASE_URL automatically, fallback to SQLite for local dev
@@ -141,8 +158,12 @@ CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME')
 CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY')  
 CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET')
 
-# Configure Cloudinary if credentials are available
-if all([CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET]):
+# Configure media storage strategy
+# Use local storage for resumes (to ensure downloadable links work)
+# Use Cloudinary for images if available
+USE_CLOUDINARY_FOR_IMAGES = all([CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET])
+
+if USE_CLOUDINARY_FOR_IMAGES:
     try:
         import cloudinary
         import cloudinary.uploader
@@ -155,16 +176,19 @@ if all([CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET]):
             secure=True,  # Force HTTPS
         )
         
-        # Use Cloudinary for default file storage
-        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-        print("✅ Cloudinary configured successfully for Railway production")
+        print("Cloudinary configured for images, local storage for resumes")
         
     except ImportError:
-        print("⚠️  Cloudinary packages not installed, using local storage")
-        DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+        print("Cloudinary packages not installed, using local storage for all files")
+        USE_CLOUDINARY_FOR_IMAGES = False
 else:
-    print("⚠️  Cloudinary credentials not found, using local storage")
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    print("Cloudinary credentials not found, using local storage for all files")
+
+# Always use local storage as default to ensure resume downloads work
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+# Ensure media directory exists
+os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 # Crispy Forms Configuration
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
