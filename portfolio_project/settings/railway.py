@@ -78,31 +78,27 @@ DEBUG = os.environ.get("DEBUG", "False") == "True"
 # Railway domain configuration for production
 RAILWAY_DOMAIN = os.environ.get("RAILWAY_PUBLIC_DOMAIN", "")
 
-# ALLOWED_HOSTS configuration
-# Always allow localhost and internal Railway healthcheck IPs
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
-
-# Add Railway domain if provided
-if RAILWAY_DOMAIN:
-    ALLOWED_HOSTS.append(RAILWAY_DOMAIN)
-    # Also add the full Railway domain format if needed
-    if not RAILWAY_DOMAIN.endswith(".railway.app"):
-        ALLOWED_HOSTS.append(f"{RAILWAY_DOMAIN}.up.railway.app")
-
-# For healthcheck robustness, also allow Railway internal IPs
-# Railway uses internal load balancer IPs for health checks
-RAILWAY_HEALTHCHECK_HOSTS = [
-    "railway.internal", 
-    "*.railway.internal",
-    "10.0.0.0/8",  # Internal Railway network
-    "172.16.0.0/12",  # Docker network range
-    "192.168.0.0/16",  # Local network range
+# ALLOWED_HOSTS configuration - Railway healthcheck fix
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "0.0.0.0",
 ]
 
-# In production, be more permissive for healthchecks but secure for regular traffic
-if not DEBUG and not RAILWAY_DOMAIN:
-    # If no specific domain set, allow wildcard for Railway healthcheck to work
-    ALLOWED_HOSTS.append("*")
+# Add Railway domain if present
+railway_domain = os.environ.get("RAILWAY_PUBLIC_DOMAIN")
+if railway_domain:
+    ALLOWED_HOSTS.append(railway_domain)
+    # Also add full Railway domain format if needed
+    if not railway_domain.endswith(".railway.app"):
+        ALLOWED_HOSTS.append(f"{railway_domain}.up.railway.app")
+
+# Allow internal Railway IPs for healthcheck - CRITICAL for Railway
+ALLOWED_HOSTS.append(".railway.internal")
+ALLOWED_HOSTS.append("*")  # Fallback safety net for Railway healthcheck
+
+# Update RAILWAY_DOMAIN variable to match the environment variable name used above
+RAILWAY_DOMAIN = railway_domain
 
 # CSRF trusted origins for Railway
 CSRF_TRUSTED_ORIGINS = []
@@ -120,12 +116,16 @@ else:
         "https://*.railway.app",
     ]
 
+# Trust Railway Proxy - CRITICAL for Railway healthcheck
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Debug output for Railway configuration
 print(f"🚀 Railway Configuration:")
 print(f"   DEBUG: {DEBUG}")
 print(f"   RAILWAY_DOMAIN: {RAILWAY_DOMAIN or 'Not set'}")
 print(f"   ALLOWED_HOSTS: {ALLOWED_HOSTS}")
 print(f"   CSRF_TRUSTED_ORIGINS: {CSRF_TRUSTED_ORIGINS}")
+print(f"   SECURE_PROXY_SSL_HEADER: {SECURE_PROXY_SSL_HEADER}")
 
 # ✅ Database config from Railway
 # Railway provides DATABASE_URL automatically, fallback to SQLite for local dev

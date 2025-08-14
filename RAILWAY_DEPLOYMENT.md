@@ -1,6 +1,16 @@
-# Railway Deployment Guide - Production Health Fix
+# Railway Deployment Guide - Healthcheck Fix Complete
 
-## ✅ **Environment Variables to Set in Railway**
+## ✅ **Railway Healthcheck Issues RESOLVED**
+
+### **Fixed Issues:**
+- ❌ ~~400 Bad Request on /healthz/~~
+- ❌ ~~1/1 replicas never became healthy~~
+- ❌ ~~Container failing healthcheck~~
+- ✅ **Django now accepts Railway internal IPs**
+- ✅ **Proxy SSL headers trusted**
+- ✅ **ALLOWED_HOSTS includes Railway domains**
+
+## 🚀 **Environment Variables to Set in Railway**
 
 Set these environment variables in your Railway dashboard:
 
@@ -8,6 +18,10 @@ Set these environment variables in your Railway dashboard:
 ```bash
 DEBUG=False
 DJANGO_SECRET_KEY=your-super-secret-key-here-min-50-chars-long-and-random
+```
+
+### **Recommended (but optional)** 
+```bash
 RAILWAY_PUBLIC_DOMAIN=your-app-name.up.railway.app
 ```
 
