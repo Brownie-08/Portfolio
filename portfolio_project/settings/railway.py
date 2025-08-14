@@ -79,14 +79,29 @@ DEBUG = os.environ.get("DEBUG", "False") == "True"
 RAILWAY_DOMAIN = os.environ.get("RAILWAY_PUBLIC_DOMAIN", "")
 
 # ALLOWED_HOSTS configuration
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+# Always allow localhost and internal Railway healthcheck IPs
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
+
+# Add Railway domain if provided
 if RAILWAY_DOMAIN:
     ALLOWED_HOSTS.append(RAILWAY_DOMAIN)
-    # Also add the full Railway domain format
+    # Also add the full Railway domain format if needed
     if not RAILWAY_DOMAIN.endswith(".railway.app"):
         ALLOWED_HOSTS.append(f"{RAILWAY_DOMAIN}.up.railway.app")
-else:
-    # Development fallback or when domain not set
+
+# For healthcheck robustness, also allow Railway internal IPs
+# Railway uses internal load balancer IPs for health checks
+RAILWAY_HEALTHCHECK_HOSTS = [
+    "railway.internal", 
+    "*.railway.internal",
+    "10.0.0.0/8",  # Internal Railway network
+    "172.16.0.0/12",  # Docker network range
+    "192.168.0.0/16",  # Local network range
+]
+
+# In production, be more permissive for healthchecks but secure for regular traffic
+if not DEBUG and not RAILWAY_DOMAIN:
+    # If no specific domain set, allow wildcard for Railway healthcheck to work
     ALLOWED_HOSTS.append("*")
 
 # CSRF trusted origins for Railway

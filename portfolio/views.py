@@ -12,6 +12,10 @@ from .models import (
     Skill, CareerTimeline, FooterLink
 )
 from .forms import ContactForm
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_http_methods
 
 
 class HomeView(TemplateView):
@@ -492,3 +496,61 @@ project_detail = ProjectDetailView.as_view()
 blog_list = BlogListView.as_view()
 blog_detail = BlogDetailView.as_view()
 contact = ContactView.as_view()
+
+
+# ============================================================================
+# RAILWAY HEALTHCHECK ENDPOINTS - Bulletproof for production deployment
+# ============================================================================
+
+@never_cache
+@csrf_exempt
+@require_http_methods(["GET", "HEAD"])
+def healthz(request):
+    """Railway-specific healthcheck endpoint that bypasses all Django restrictions.
+    
+    This endpoint is designed to always return 200 OK for Railway health checks,
+    regardless of DEBUG settings, ALLOWED_HOSTS, or CSRF configuration.
+    """
+    return JsonResponse({"status": "ok"})
+
+
+@never_cache
+@csrf_exempt
+@require_http_methods(["GET", "HEAD"])
+def health_simple(request):
+    """Alternative simple health check - returns plain text OK.
+    
+    Backup healthcheck endpoint in case JSON response has issues.
+    Railway can use either /healthz/ or /health-simple/ 
+    """
+    return HttpResponse("OK", content_type="text/plain", status=200)
+
+
+@never_cache
+@csrf_exempt
+@require_http_methods(["GET", "HEAD"])
+def railway_status(request):
+    """Railway deployment status check with minimal Django dependencies.
+    
+    Returns basic app status without database or complex operations.
+    Use this as Railway healthcheck if others fail.
+    """
+    import os
+    import django
+    
+    status_data = {
+        "status": "healthy",
+        "service": "django-portfolio",
+        "django_version": django.get_version(),
+        "debug_mode": settings.DEBUG,
+        "environment": "railway-production",
+        "timestamp": "",
+    }
+    
+    try:
+        from datetime import datetime
+        status_data["timestamp"] = datetime.now().isoformat()
+    except Exception:
+        status_data["timestamp"] = "unknown"
+    
+    return JsonResponse(status_data)

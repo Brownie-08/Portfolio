@@ -20,6 +20,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from portfolio.health import health_check, ready_check, simple_health_check
+from portfolio.views import healthz, health_simple, railway_status
 
 urlpatterns = [
     # Health check endpoints for Railway

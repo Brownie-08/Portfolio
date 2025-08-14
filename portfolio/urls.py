@@ -22,6 +22,11 @@ urlpatterns = [
     # Contact page
     path('contact/', views.ContactView.as_view(), name='contact'),
     
+    # Railway healthcheck endpoints (bulletproof for production)
+    path('healthz/', views.healthz, name='healthz'),
+    path('health-simple/', views.health_simple, name='health_simple'),
+    path('railway-status/', views.railway_status, name='railway_status'),
+    
     # Direct resume serving (works on Railway production)
     path('resume/latest/', views.latest_resume_view, name='latest_resume_view'),
     path('resume/download/', views.latest_resume_download, name='latest_resume_download'),
