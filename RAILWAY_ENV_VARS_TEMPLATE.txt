@@ -1,0 +1,29 @@
+# 🚀 Railway Environment Variables for Superuser Auto-Creation
+# 
+# Copy these to your Railway project Variables section:
+# Go to: Railway Dashboard → Your Project → Variables → Add Variables
+
+# Required for automatic superuser creation:
+DJANGO_SUPERUSER_USERNAME=admin
+DJANGO_SUPERUSER_EMAIL=admin@yourdomain.com
+DJANGO_SUPERUSER_PASSWORD=YourSecurePassword123!
+
+# Optional but recommended:
+DJANGO_SECRET_KEY=your-super-secret-django-key-here-make-it-long-and-random-123456789012345678901234567890
+
+# Already configured (Railway provides automatically):
+# DATABASE_URL=postgresql://... (Railway auto-generates)
+# RAILWAY_PUBLIC_DOMAIN=your-app.up.railway.app (Railway auto-generates)
+
+# Instructions:
+# 1. Go to Railway → Your Project → Variables
+# 2. Click "Add Variable" for each of the above
+# 3. Replace the example values with your actual credentials
+# 4. Deploy your app
+# 5. Access /admin/ with your new credentials
+
+# Security Notes:
+# - Use a STRONG password for DJANGO_SUPERUSER_PASSWORD
+# - Use a real email address for DJANGO_SUPERUSER_EMAIL  
+# - Generate a random SECRET_KEY (50+ characters recommended)
+# - Never commit these values to your code repository

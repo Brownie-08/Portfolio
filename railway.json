@@ -5,7 +5,7 @@
     "buildCommand": "pip install -r requirements.txt && python manage.py collectstatic --noinput --settings=portfolio_project.settings.railway"
   },
   "deploy": {
-    "startCommand": "python manage.py migrate --noinput --settings=portfolio_project.settings.railway && python manage.py loaddata data.json --settings=portfolio_project.settings.railway || echo 'Data loading failed or no data to load' && gunicorn portfolio_project.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --access-logfile - --error-logfile - --log-level info",
+    "startCommand": "python manage.py migrate --noinput --settings=portfolio_project.settings.railway && python manage.py create_superuser_railway --settings=portfolio_project.settings.railway || echo 'Superuser creation skipped - will be created automatically on first request' && python manage.py loaddata data.json --settings=portfolio_project.settings.railway || echo 'Data loading failed or no data to load' && gunicorn portfolio_project.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --access-logfile - --error-logfile - --log-level info",
     "healthcheckPath": "/healthz/",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
