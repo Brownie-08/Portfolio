@@ -27,33 +27,38 @@ class Command(BaseCommand):
         email = os.getenv("DJANGO_SUPERUSER_EMAIL", "admin@example.com")
         password = os.getenv("DJANGO_SUPERUSER_PASSWORD", "adminpass123")
 
-        self.stdout.write(f"🔧 Attempting to create superuser with username: {username}")
-
-        # Check if user already exists
-        if User.objects.filter(username=username).exists():
-            if not options['force']:
-                self.stdout.write(
-                    self.style.WARNING(f"⚠️  User '{username}' already exists. Use --force to recreate.")
-                )
-                return
-            else:
-                # Delete existing user if --force is used
-                User.objects.filter(username=username).delete()
-                self.stdout.write(f"🗑️  Existing user '{username}' deleted.")
+        self.stdout.write(f"🔧 Creating/updating superuser with username: {username}")
 
         try:
-            # Create the superuser
-            User.objects.create_superuser(
+            # Use get_or_create to handle both creation and updates
+            user, created = User.objects.get_or_create(
                 username=username,
-                email=email,
-                password=password
+                defaults={
+                    "email": email,
+                    "is_staff": True,
+                    "is_superuser": True,
+                }
             )
             
-            self.stdout.write(
-                self.style.SUCCESS(f"✅ Superuser '{username}' created successfully!")
-            )
+            # Always update critical fields (similar to apps.py logic)
+            user.email = email
+            user.is_staff = True
+            user.is_superuser = True
+            user.set_password(password)  # Force reset password
+            user.save()
+            
+            if created:
+                self.stdout.write(
+                    self.style.SUCCESS(f"✅ Superuser '{username}' created successfully!")
+                )
+            else:
+                self.stdout.write(
+                    self.style.SUCCESS(f"✅ Superuser '{username}' updated with fresh credentials!")
+                )
+                
             self.stdout.write(f"📧 Email: {email}")
             self.stdout.write(f"🔗 Login at: /admin/")
+            self.stdout.write(f"🎯 Password updated from Railway environment variables")
             self.stdout.write(f"🌐 Environment variables used:")
             self.stdout.write(f"   DJANGO_SUPERUSER_USERNAME={username}")
             self.stdout.write(f"   DJANGO_SUPERUSER_EMAIL={email}")
@@ -61,5 +66,5 @@ class Command(BaseCommand):
             
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f"❌ Failed to create superuser: {e}")
+                self.style.ERROR(f"❌ Failed to create/update superuser: {e}")
             )

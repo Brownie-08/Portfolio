@@ -28,14 +28,17 @@ INSTALLED_APPS = [
     "dashboard",
 ]
 
-# Only add Cloudinary apps if available
+# ✅ Cloudinary Apps - Only add if packages are available and configured
+# We'll check credentials later and only configure if both packages and credentials exist
 try:
     import cloudinary
     import cloudinary_storage
+    # Add cloudinary apps - they'll be configured later when we have credentials
     INSTALLED_APPS.insert(-2, "cloudinary_storage")
     INSTALLED_APPS.insert(-2, "cloudinary")
+    print("📦 Cloudinary packages found and added to INSTALLED_APPS")
 except ImportError:
-    pass
+    print("ℹ️  Cloudinary packages not installed - using local storage only")
 
 # Django Configuration
 ROOT_URLCONF = "portfolio_project.urls"
@@ -128,17 +131,27 @@ print(f"   CSRF_TRUSTED_ORIGINS: {CSRF_TRUSTED_ORIGINS}")
 print(f"   SECURE_PROXY_SSL_HEADER: {SECURE_PROXY_SSL_HEADER}")
 
 # ✅ Database config from Railway
-# Railway provides DATABASE_URL automatically, fallback to SQLite for local dev
+# Railway provides DATABASE_URL automatically for PostgreSQL
 DATABASE_URL = os.environ.get('DATABASE_URL')
-print(f"📊 DATABASE_URL detected: {'Yes (Postgres)' if DATABASE_URL and 'postgresql' in DATABASE_URL else 'No (using SQLite fallback)'}")
 
-DATABASES = {
-    "default": dj_database_url.config(
-        default=f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}",
-        conn_max_age=600,
-        ssl_require=False,  # Railway handles SSL automatically
-    )
-}
+if DATABASE_URL and 'postgresql' in DATABASE_URL:
+    print(f"📊 DATABASE_URL detected: Yes (PostgreSQL) - {DATABASE_URL[:30]}...")
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=True,  # Require SSL for PostgreSQL connections
+        )
+    }
+else:
+    print(f"📊 DATABASE_URL detected: No (using SQLite fallback for development)")
+    print(f"⚠️  PRODUCTION WARNING: PostgreSQL not configured! Add DATABASE_URL to Railway variables.")
+    DATABASES = {
+        "default": {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
 
 # Debug: Print database engine being used
 print(f"🔗 Database ENGINE: {DATABASES['default'].get('ENGINE', 'Not configured')}")
@@ -185,36 +198,58 @@ TEMPLATES = [
     },
 ]
 
-# Cloudinary configuration (optional - will fallback to local storage if not available)
-CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME')
-CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY')  
-CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET')
+# ✅ Cloudinary Configuration (Robust handling)
+# Get Cloudinary credentials from environment
+CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', '').strip()
+CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '').strip()
+CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', '').strip()
+CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL', '').strip()
 
-# Configure media storage strategy
-# Use local storage for resumes (to ensure downloadable links work)
-# Use Cloudinary for images if available
-USE_CLOUDINARY_FOR_IMAGES = all([CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET])
+# Check if we have valid Cloudinary credentials
+HAS_CLOUDINARY_CREDENTIALS = bool(
+    (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET) or 
+    CLOUDINARY_URL
+)
 
-if USE_CLOUDINARY_FOR_IMAGES:
+# Initialize Cloudinary if we have credentials and packages
+USE_CLOUDINARY_FOR_IMAGES = False
+
+if HAS_CLOUDINARY_CREDENTIALS:
     try:
         import cloudinary
         import cloudinary.uploader
         import cloudinary.api
         
-        cloudinary.config(
-            cloud_name=CLOUDINARY_CLOUD_NAME,
-            api_key=CLOUDINARY_API_KEY,
-            api_secret=CLOUDINARY_API_SECRET,
-            secure=True,  # Force HTTPS
-        )
+        # Configure Cloudinary
+        if CLOUDINARY_URL:
+            # Use CLOUDINARY_URL if provided (contains all credentials)
+            cloudinary.config(cloudinary_url=CLOUDINARY_URL, secure=True)
+        else:
+            # Use individual credentials
+            cloudinary.config(
+                cloud_name=CLOUDINARY_CLOUD_NAME,
+                api_key=CLOUDINARY_API_KEY,
+                api_secret=CLOUDINARY_API_SECRET,
+                secure=True,  # Force HTTPS
+            )
         
-        print("Cloudinary configured for images, local storage for resumes")
+        USE_CLOUDINARY_FOR_IMAGES = True
+        print(f"✅ Cloudinary configured successfully for images (Cloud: {CLOUDINARY_CLOUD_NAME or 'from URL'})")
+        print("📁 Local storage will be used for resume downloads")
         
-    except ImportError:
-        print("Cloudinary packages not installed, using local storage for all files")
+    except ImportError as e:
+        print(f"⚠️  Cloudinary packages not available: {e}")
+        print("📁 Using local storage for all files")
+        USE_CLOUDINARY_FOR_IMAGES = False
+        
+    except Exception as e:
+        print(f"⚠️  Cloudinary configuration failed: {e}")
+        print("📁 Falling back to local storage")
         USE_CLOUDINARY_FOR_IMAGES = False
 else:
-    print("Cloudinary credentials not found, using local storage for all files")
+    print("ℹ️  Cloudinary credentials not provided - using local storage for all files")
+    print("💡 To enable Cloudinary, set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET")
+    print("💡 Or set CLOUDINARY_URL with full connection string")
 
 # Always use local storage as default to ensure resume downloads work
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'

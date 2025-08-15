@@ -3,10 +3,20 @@
 # Copy these to your Railway project Variables section:
 # Go to: Railway Dashboard → Your Project → Variables → Add Variables
 
+# Required for PostgreSQL database:
+DATABASE_URL=postgresql://postgres:password@server:5432/railway
+
 # Required for automatic superuser creation:
 DJANGO_SUPERUSER_USERNAME=admin
 DJANGO_SUPERUSER_EMAIL=admin@yourdomain.com
 DJANGO_SUPERUSER_PASSWORD=YourSecurePassword123!
+
+# Required for Cloudinary image storage:
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
+# OR alternatively use:
+# CLOUDINARY_URL=cloudinary://api_key:api_secret@cloud_name
 
 # Optional but recommended:
 DJANGO_SECRET_KEY=your-super-secret-django-key-here-make-it-long-and-random-123456789012345678901234567890
