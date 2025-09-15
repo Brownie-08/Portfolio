@@ -18,4 +18,7 @@ python manage.py collectstatic --noinput --settings=portfolio_project.settings.r
 echo "🗃️ Running database migrations..."
 python manage.py migrate --noinput --settings=portfolio_project.settings.render
 
+echo "👤 Creating admin user..."
+python create_admin.py
+
 echo "✅ Build completed successfully!"
