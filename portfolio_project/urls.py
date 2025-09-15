@@ -21,6 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from portfolio.health import health_check, ready_check, simple_health_check
 from portfolio.views import healthz, health_simple, railway_status
+from portfolio import views as portfolio_views
 
 urlpatterns = [
     # Health check endpoints for Railway
@@ -31,6 +32,10 @@ urlpatterns = [
     # Main application URLs
     path('admin/', admin.site.urls),
     path('dashboard/', include('dashboard.urls')),
+    
+    # Media handling for production - redirect direct media requests to proper views
+    path('media/resumes/<path:filename>', portfolio_views.resume_media_redirect, name='resume_media_redirect'),
+    
     path('', include('portfolio.urls')),
 ]
 

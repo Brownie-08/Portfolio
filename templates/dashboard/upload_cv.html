@@ -1,5 +1,6 @@
 {% extends 'dashboard/base.html' %}
 {% load crispy_forms_tags %}
+{% load portfolio_extras %}
 
 {% block title %}Upload CV/Resume{% endblock %}
 
@@ -79,7 +80,8 @@
                 </div>
                 
                 <div class="d-grid gap-2">
-                    <a href="{{ object.resume.url }}" class="btn btn-outline-primary" target="_blank">
+                    {% resume_download_url object as resume_url %}
+                    <a href="{{ resume_url }}" class="btn btn-outline-primary" target="_blank">
                         <i class="bi bi-download me-2"></i>Download Current CV
                     </a>
                     <a href="/" class="btn btn-outline-info" target="_blank">

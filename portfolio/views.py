@@ -513,6 +513,22 @@ def latest_resume_download(request):
     
     raise Http404("Resume not found")
 
+
+def resume_media_redirect(request, filename):
+    """
+    Redirect legacy /media/resumes/ URLs to the proper resume view.
+    This eliminates 404 warnings for direct media URL access.
+    """
+    from django.shortcuts import redirect
+    import logging
+    
+    logger = logging.getLogger(__name__)
+    logger.info(f"Redirecting legacy media URL for: {filename}")
+    
+    # Redirect to the latest resume download view
+    return redirect('portfolio:latest_resume_download')
+
+
 # Legacy function-based view names for backward compatibility
 # These will call the class-based views
 home = HomeView.as_view()
