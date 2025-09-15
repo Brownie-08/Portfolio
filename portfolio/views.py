@@ -420,21 +420,30 @@ def latest_resume_view(request):
     try:
         personal_info = PersonalInfo.get_active()
         if personal_info and personal_info.resume:
-            # For Cloudinary storage, redirect to the direct URL
-            if 'cloudinary' in settings.DEFAULT_FILE_STORAGE.lower():
-                url = personal_info.resume.url
-                return redirect(url)
+            # Check if the resume URL contains cloudinary - indicating Cloudinary storage
+            resume_url = personal_info.resume.url
             
-            # For local storage, serve the file directly
-            elif os.path.exists(personal_info.resume.path):
-                response = FileResponse(
-                    open(personal_info.resume.path, 'rb'), 
-                    as_attachment=False,  # Open in browser
-                    content_type='application/pdf'
-                )
-                # Add cache headers for better performance
-                response['Cache-Control'] = 'public, max-age=3600'
-                return response
+            if 'cloudinary' in resume_url.lower():
+                # For Cloudinary storage, redirect to the direct URL
+                return redirect(resume_url)
+            else:
+                # For local storage, serve the file directly
+                try:
+                    if hasattr(personal_info.resume, 'path') and os.path.exists(personal_info.resume.path):
+                        response = FileResponse(
+                            open(personal_info.resume.path, 'rb'), 
+                            as_attachment=False,  # Open in browser
+                            content_type='application/pdf'
+                        )
+                        # Add cache headers for better performance
+                        response['Cache-Control'] = 'public, max-age=3600'
+                        return response
+                    else:
+                        # Fallback - redirect to the URL anyway
+                        return redirect(resume_url)
+                except (AttributeError, OSError):
+                    # If path doesn't exist, try redirecting to URL
+                    return redirect(resume_url)
     except Exception as e:
         # Log error but don't expose details
         import logging
@@ -454,31 +463,48 @@ def latest_resume_download(request):
     try:
         personal_info = PersonalInfo.get_active()
         if personal_info and personal_info.resume:
-            # For Cloudinary storage, redirect to the direct URL with download parameters
-            if 'cloudinary' in settings.DEFAULT_FILE_STORAGE.lower():
-                url = personal_info.resume.url
-                # Add download parameter to force download
-                if '?' in url:
-                    url += '&fl_attachment'
-                else:
-                    url += '?fl_attachment'
-                return redirect(url)
+            # Check if the resume URL contains cloudinary - indicating Cloudinary storage
+            resume_url = personal_info.resume.url
             
-            # For local storage, serve the file directly
-            elif os.path.exists(personal_info.resume.path):
-                filename = os.path.basename(personal_info.resume.name)
-                if not filename:
-                    filename = "resume.pdf"
-                
-                response = FileResponse(
-                    open(personal_info.resume.path, 'rb'), 
-                    as_attachment=True,  # Force download
-                    filename=filename,
-                    content_type='application/pdf'
-                )
-                # Add cache headers for better performance
-                response['Cache-Control'] = 'public, max-age=3600'
-                return response
+            if 'cloudinary' in resume_url.lower():
+                # For Cloudinary storage, redirect to the direct URL with download parameters
+                # Add download parameter to force download
+                if '?' in resume_url:
+                    url = resume_url + '&fl_attachment'
+                else:
+                    url = resume_url + '?fl_attachment'
+                return redirect(url)
+            else:
+                # For local storage, serve the file directly
+                try:
+                    if hasattr(personal_info.resume, 'path') and os.path.exists(personal_info.resume.path):
+                        filename = os.path.basename(personal_info.resume.name)
+                        if not filename:
+                            filename = "resume.pdf"
+                        
+                        response = FileResponse(
+                            open(personal_info.resume.path, 'rb'), 
+                            as_attachment=True,  # Force download
+                            filename=filename,
+                            content_type='application/pdf'
+                        )
+                        # Add cache headers for better performance
+                        response['Cache-Control'] = 'public, max-age=3600'
+                        return response
+                    else:
+                        # Fallback - redirect to the URL with download parameter
+                        if '?' in resume_url:
+                            url = resume_url + '&download=1'
+                        else:
+                            url = resume_url + '?download=1'
+                        return redirect(url)
+                except (AttributeError, OSError):
+                    # If path doesn't exist, try redirecting to URL with download parameter
+                    if '?' in resume_url:
+                        url = resume_url + '&download=1'
+                    else:
+                        url = resume_url + '?download=1'
+                    return redirect(url)
     except Exception as e:
         # Log error but don't expose details
         import logging
