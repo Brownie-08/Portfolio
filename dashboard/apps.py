@@ -16,13 +16,13 @@ class DashboardConfig(AppConfig):
             # Check if database tables exist first
             table_names = connection.introspection.table_names()
             if 'auth_user' not in table_names:
-                print("⚠️  Database tables not yet created. Skipping superuser creation.")
+                print("[WARNING] Database tables not yet created. Skipping superuser creation.")
                 return
                 
             self.create_or_update_superuser()
                 
         except Exception as e:
-            print(f"⚠️  Superuser creation/update skipped: {e}")
+            print(f"[WARNING] Superuser creation/update skipped: {e}")
             # Don't raise the exception to avoid breaking the app startup
             
     def create_or_update_superuser(self):
@@ -55,13 +55,13 @@ class DashboardConfig(AppConfig):
             user.save()
             
             if created:
-                print(f"✅ Superuser '{username}' created successfully!")
+                print(f"[SUCCESS] Superuser '{username}' created successfully!")
             else:
-                print(f"✅ Superuser '{username}' updated with fresh credentials!")
+                print(f"[SUCCESS] Superuser '{username}' updated with fresh credentials!")
                 
-            print(f"📧 Email: {email}")
-            print(f"🔗 Admin URL: /admin/")
-            print(f"🎯 Password updated from Railway environment variables")
+            print(f"[INFO] Email: {email}")
+            print(f"[INFO] Admin URL: /admin/")
+            print(f"[INFO] Password updated from Railway environment variables")
             
         except Exception as e:
-            print(f"❌ Failed to create/update superuser: {e}")
+            print(f"[ERROR] Failed to create/update superuser: {e}")

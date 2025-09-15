@@ -134,24 +134,23 @@ print(f"   SECURE_PROXY_SSL_HEADER: {SECURE_PROXY_SSL_HEADER}")
 # Railway provides DATABASE_URL automatically for PostgreSQL
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
-if DATABASE_URL and 'postgresql' in DATABASE_URL:
-    print(f"📊 DATABASE_URL detected: Yes (PostgreSQL) - {DATABASE_URL[:30]}...")
-    DATABASES = {
-        "default": dj_database_url.config(
-            default=DATABASE_URL,
-            conn_max_age=600,
-            ssl_require=True,  # Require SSL for PostgreSQL connections
-        )
-    }
-else:
-    print(f"📊 DATABASE_URL detected: No (using SQLite fallback for development)")
-    print(f"⚠️  PRODUCTION WARNING: PostgreSQL not configured! Add DATABASE_URL to Railway variables.")
-    DATABASES = {
-        "default": {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
+# PRODUCTION: Force PostgreSQL only - No SQLite fallback!
+if not DATABASE_URL:
+    raise Exception("❌ PRODUCTION ERROR: DATABASE_URL environment variable is required! "
+                   "Add PostgreSQL DATABASE_URL to Railway environment variables.")
+
+if 'postgresql' not in DATABASE_URL:
+    raise Exception(f"❌ PRODUCTION ERROR: Only PostgreSQL databases are supported in production. "
+                   f"Got: {DATABASE_URL[:50]}...")
+
+print(f"[DATABASE] PostgreSQL connection configured: {DATABASE_URL[:50]}...")
+DATABASES = {
+    "default": dj_database_url.config(
+        default=DATABASE_URL,
+        conn_max_age=600,
+        ssl_require=True,  # Require SSL for PostgreSQL connections
+    )
+}
 
 # Debug: Print database engine being used
 print(f"🔗 Database ENGINE: {DATABASES['default'].get('ENGINE', 'Not configured')}")

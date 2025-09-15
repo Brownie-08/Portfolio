@@ -1,17 +1,21 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+# exit on error
+set -o errexit
 
-echo "🔧 Starting build process..."
+echo "🔧 Starting build process for Render deployment..."
 
+# Update pip to latest version
 echo "📦 Upgrading pip..."
-python -m pip install --upgrade pip
+pip install --upgrade pip
 
-echo "📋 Installing requirements..."
-python -m pip install -r requirements.txt
-
-echo "🎨 Skipping SCSS compilation for now to ensure deployment succeeds..."
+# Install Python dependencies
+echo "📚 Installing Python requirements..."
+pip install -r requirements.txt
 
 echo "🎨 Collecting static files..."
-python manage.py collectstatic --noinput --clear
+python manage.py collectstatic --noinput --settings=portfolio_project.settings.render
+
+echo "🗃️ Running database migrations..."
+python manage.py migrate --noinput --settings=portfolio_project.settings.render
 
 echo "✅ Build completed successfully!"
