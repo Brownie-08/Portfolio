@@ -182,18 +182,19 @@ from django.conf import settings
 
 class ResumeStorage(FileSystemStorage):
     """
-    Custom storage backend for resumes using Railway volume.
-    
-    This storage class ensures that resumes/PDFs are stored on the Railway volume
-    and served directly through Railway's static assets configuration, avoiding
-    401 authentication errors while keeping images on Cloudinary.
+    Custom storage backend for resumes using local media storage.
+
+    This keeps resume/PDF uploads in MEDIA_ROOT so they can be served from
+    PythonAnywhere's media files mapping.
     """
     
     def __init__(self, *args, **kwargs):
-        # Force specific location and base_url for Railway volume
-        kwargs['location'] = getattr(settings, 'MEDIA_ROOT', '/app/media')
-        kwargs['base_url'] = getattr(settings, 'MEDIA_URL', '/media/')
+        kwargs["location"] = getattr(settings, "MEDIA_ROOT")
+        kwargs["base_url"] = getattr(settings, "MEDIA_URL", "/media/")
         super().__init__(*args, **kwargs)
+
+    def deconstruct(self):
+        return ("portfolio_project.storages.ResumeStorage", [], {})
     
     def get_available_name(self, name, max_length=None):
         """
@@ -213,13 +214,9 @@ class ResumeStorage(FileSystemStorage):
         # Ensure the URL uses the correct media URL
         url = super().url(name)
         
-        # In production, Railway will serve these files directly
-        # No additional processing needed
         return url
 
 
 # Backward compatibility aliases
 PDFStorage = PublicPDFStorage
-# Note: ResumeStorage now points to Railway volume storage, not Cloudinary
-# This is the key change for the Railway volume implementation
 DocumentStorage = PublicPDFStorage

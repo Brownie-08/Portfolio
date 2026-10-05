@@ -7,9 +7,11 @@ class DashboardConfig(AppConfig):
     name = "dashboard"
 
     def ready(self):
-        """Create or update superuser automatically on every deployment."""
+        """Optionally create or update a superuser from environment variables."""
+        if os.getenv("DJANGO_AUTO_CREATE_SUPERUSER", "False") != "True":
+            return
+
         # Import here to avoid Django startup issues
-        from django.contrib.auth import get_user_model
         from django.db import connection
         
         try:
@@ -34,7 +36,11 @@ class DashboardConfig(AppConfig):
         # Get superuser credentials from environment variables
         username = os.getenv("DJANGO_SUPERUSER_USERNAME", "admin")
         email = os.getenv("DJANGO_SUPERUSER_EMAIL", "admin@example.com")
-        password = os.getenv("DJANGO_SUPERUSER_PASSWORD", "adminpass123")
+        password = os.getenv("DJANGO_SUPERUSER_PASSWORD")
+
+        if not password:
+            print("[WARNING] DJANGO_SUPERUSER_PASSWORD is required to auto-create a superuser.")
+            return
         
         try:
             # Use get_or_create to handle both creation and updates
@@ -61,7 +67,7 @@ class DashboardConfig(AppConfig):
                 
             print(f"[INFO] Email: {email}")
             print(f"[INFO] Admin URL: /admin/")
-            print(f"[INFO] Password updated from Railway environment variables")
+            print(f"[INFO] Password updated from environment variables")
             
         except Exception as e:
             print(f"[ERROR] Failed to create/update superuser: {e}")

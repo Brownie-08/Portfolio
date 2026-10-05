@@ -2,15 +2,10 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.core.cache import cache
-from django.conf import settings
-from django.core.files.storage import FileSystemStorage
-import os
+from portfolio_project.storages import ResumeStorage
 
-# Local storage for resume files (served directly by Railway/Django)
-resume_storage = FileSystemStorage(
-    location=getattr(settings, 'MEDIA_ROOT', os.path.join(settings.BASE_DIR, 'media')),
-    base_url=getattr(settings, 'MEDIA_URL', '/media/')
-)
+# Local storage for resume files.
+resume_storage = ResumeStorage()
 
 
 class Tag(models.Model):

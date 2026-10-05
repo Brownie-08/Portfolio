@@ -5,16 +5,17 @@ This file contains settings that are common across all environments.
 Environment-specific settings should be placed in dev.py or prod.py.
 """
 
-from pathlib import Path
 import environ
 import os
+from django.core.exceptions import ImproperlyConfigured
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Initialize environ
 env = environ.Env(
-    DEBUG=(bool, False),
+    DEBUG=(bool, True),
     USE_CLOUDINARY=(bool, False),
     SECURE_SSL_REDIRECT=(bool, True),
     SESSION_COOKIE_SECURE=(bool, True),
@@ -27,12 +28,20 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # SECURITY WARNING: keep the secret key used in production secret!
 # Try DJANGO_SECRET_KEY first, fallback to SECRET_KEY for compatibility
 SECRET_KEY = env('DJANGO_SECRET_KEY', default=env('SECRET_KEY', default=None))
+if not SECRET_KEY:
+    SECRET_KEY = "django-insecure-development-only-change-me"
 
 # Debug setting
 DEBUG = env('DEBUG')
 
 # Allowed hosts
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
+
+if not DEBUG and SECRET_KEY == "django-insecure-development-only-change-me":
+    raise ImproperlyConfigured(
+        "DJANGO_SECRET_KEY or SECRET_KEY must be set when DEBUG is False."
+    )
 
 # Application definition
 INSTALLED_APPS = [
@@ -82,6 +91,14 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "portfolio_project.wsgi.application"
+
+# Database
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

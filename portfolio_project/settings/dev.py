@@ -11,63 +11,13 @@ from .base import *
 # DEBUG and ALLOWED_HOSTS are already configured in base.py using django-environ
 # Additional development-specific overrides can be set here
 
-# Database configuration for development
-# Using environment variables with SQLite as fallback
-DATABASE_URL = env('DATABASE_URL', default=None)
-
-# Check for separate MySQL settings first
-DB_ENGINE = env('DB_ENGINE', default=None)
-DB_NAME = env('DB_NAME', default=None)
-DB_USER = env('DB_USER', default=None)
-DB_PASSWORD = env('DB_PASSWORD', default=None)
-DB_HOST = env('DB_HOST', default='localhost')
-DB_PORT = env.int('DB_PORT', default=3306)
-
-if DB_ENGINE and DB_NAME:
-    # Use separate database settings
-    DATABASES = {
-        'default': {
-            'ENGINE': DB_ENGINE,
-            'NAME': DB_NAME,
-            'USER': DB_USER,
-            'PASSWORD': DB_PASSWORD,
-            'HOST': DB_HOST,
-            'PORT': DB_PORT,
-            'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'" if 'mysql' in DB_ENGINE else {},
-                'charset': 'utf8mb4' if 'mysql' in DB_ENGINE else None,
-            } if 'mysql' in DB_ENGINE else {},
-        }
+# Development uses the same SQLite database as PythonAnywhere.
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
-elif DATABASE_URL:
-    # If DATABASE_URL is provided, use dj-database-url to parse it
-    try:
-        import dj_database_url
-        DATABASES = {
-            'default': dj_database_url.parse(DATABASE_URL)
-        }
-        # Add MySQL options if it's a MySQL database
-        if 'mysql' in DATABASE_URL:
-            DATABASES['default']['OPTIONS'] = {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-                'charset': 'utf8mb4',
-            }
-    except ImportError:
-        # Fallback to SQLite if dj-database-url is not available
-        DATABASES = {
-            "default": {
-                "ENGINE": "django.db.backends.sqlite3",
-                "NAME": BASE_DIR / "db.sqlite3",
-            }
-        }
-else:
-    # Default SQLite configuration for development
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+}
 
 # Development-specific apps
 if DEBUG:
@@ -147,7 +97,9 @@ SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
 # Media files configuration for Cloudinary (development)
-if env.bool('USE_CLOUDINARY', default=False):
+# Local development defaults to filesystem media so existing SQLite records
+# render from the checked local media directory.
+if env.bool('USE_CLOUDINARY_IN_DEV', default=False):
     try:
         import cloudinary
         import cloudinary.uploader

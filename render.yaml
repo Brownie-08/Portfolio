@@ -1,8 +1,8 @@
 services:
   - type: web
     runtime: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: python manage.py migrate && gunicorn portfolio_project.wsgi
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: python manage.py migrate --noinput && gunicorn portfolio_project.wsgi:application
     envVars:
       - key: DEBUG
         value: "False"
@@ -11,24 +11,16 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: USE_CLOUDINARY
-        value: True
+        value: "False"
       - key: CLOUDINARY_CLOUD_NAME
-        value: de9i7id2b
+        sync: false
       - key: CLOUDINARY_API_KEY
-        value: 547248818221456
+        sync: false
       - key: CLOUDINARY_API_SECRET
-        value: 611drBROvgh5Bkip4HZYaLRoddI
+        sync: false
       - key: DJANGO_SECRET_KEY
-        sync: false                # managed via dashboard
-      - key: SECRET_KEY
-        generateValue: true
+        sync: false
       - key: DJANGO_ALLOWED_HOSTS
-        value: "*"
-      - key: ALLOWED_HOSTS
-        value: your-render-domain.onrender.com
-
-databases:
-  - name: portfolio-db
-    databaseName: portfolio
-    user: portfolio
-    plan: free
+        sync: false
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false

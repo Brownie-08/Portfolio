@@ -1,5 +1,5 @@
 """
-Health check views for Railway deployment monitoring
+Health check views for deployment monitoring.
 """
 from django.http import JsonResponse
 from django.views.decorators.cache import never_cache
@@ -48,7 +48,7 @@ def health_check(request):
 @csrf_exempt
 def ready_check(request):
     """
-    Readiness check for Railway deployment
+    Readiness check for deployment.
     """
     try:
         # Quick database check
@@ -71,7 +71,7 @@ def ready_check(request):
 def simple_health_check(request):
     """
     Simple health check that just returns OK without database checks
-    For Railway deployment health check
+    For deployment health checks.
     """
     from django.http import HttpResponse
     from django.conf import settings
@@ -81,9 +81,8 @@ def simple_health_check(request):
     response = HttpResponse("OK", status=200, content_type="text/plain")
     
     # Add debugging headers (remove in final production)
-    if settings.DEBUG or os.environ.get('RAILWAY_DEBUG_HEADERS') == 'True':
+    if settings.DEBUG or os.environ.get('DJANGO_DEBUG_HEADERS') == 'True':
         response['X-Debug-Allowed-Hosts'] = str(settings.ALLOWED_HOSTS)
-        response['X-Debug-Railway-Domain'] = os.environ.get('RAILWAY_PUBLIC_DOMAIN', 'Not set')
         response['X-Debug-Host-Header'] = request.META.get('HTTP_HOST', 'Not set')
     
     return response

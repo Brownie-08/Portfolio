@@ -5,7 +5,8 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 from .models import (
     Tag, Project, Testimonial, 
-    ContactMessage, BlogPost
+    ContactMessage, BlogPost, PersonalInfo, Education, Certification,
+    Award, SEOSettings, Skill, CareerTimeline, FooterLink
 )
 
 
@@ -274,6 +275,94 @@ class BlogPostAdmin(admin.ModelAdmin):
         if obj:  # editing an existing object
             readonly.extend(['created', 'updated'])
         return readonly
+
+
+@admin.register(PersonalInfo)
+class PersonalInfoAdmin(admin.ModelAdmin):
+    list_display = ['full_name', 'portfolio_name', 'email', 'is_active', 'updated_at']
+    list_filter = ['is_active', 'created_at', 'updated_at']
+    search_fields = ['full_name', 'portfolio_name', 'email', 'current_role', 'location']
+    readonly_fields = ['created_at', 'updated_at']
+    fieldsets = [
+        ('Basic Information', {
+            'fields': [
+                'portfolio_name', 'full_name', 'email', 'phone', 'bio', 'location',
+                'profile_image', 'is_active'
+            ]
+        }),
+        ('About Page', {
+            'fields': [
+                'about_intro', 'years_experience', 'current_role',
+                'professional_summary', 'technical_skills', 'soft_skills', 'interests'
+            ]
+        }),
+        ('Social Links', {
+            'fields': [
+                'github_url', 'linkedin_url', 'twitter_url',
+                'website_url', 'instagram_url'
+            ]
+        }),
+        ('Resume and SEO', {
+            'fields': ['resume', 'meta_description', 'meta_keywords']
+        }),
+        ('Timestamps', {
+            'fields': ['created_at', 'updated_at']
+        }),
+    ]
+
+
+@admin.register(Education)
+class EducationAdmin(admin.ModelAdmin):
+    list_display = ['school_name', 'degree', 'start_date', 'end_date', 'is_current', 'order']
+    list_filter = ['is_current', 'start_date']
+    search_fields = ['school_name', 'degree', 'field_of_study', 'location']
+    list_editable = ['order', 'is_current']
+
+
+@admin.register(Certification)
+class CertificationAdmin(admin.ModelAdmin):
+    list_display = ['name', 'issuing_organization', 'issue_date', 'expiry_date', 'is_featured', 'order']
+    list_filter = ['is_featured', 'issue_date', 'expiry_date']
+    search_fields = ['name', 'issuing_organization', 'credential_id']
+    list_editable = ['is_featured', 'order']
+
+
+@admin.register(Award)
+class AwardAdmin(admin.ModelAdmin):
+    list_display = ['title', 'issuing_organization', 'date_received', 'category', 'is_featured', 'order']
+    list_filter = ['is_featured', 'category', 'date_received']
+    search_fields = ['title', 'issuing_organization', 'category']
+    list_editable = ['is_featured', 'order']
+
+
+@admin.register(SEOSettings)
+class SEOSettingsAdmin(admin.ModelAdmin):
+    list_display = ['page', 'title', 'description']
+    search_fields = ['page', 'title', 'description', 'keywords']
+
+
+@admin.register(Skill)
+class SkillAdmin(admin.ModelAdmin):
+    list_display = ['name', 'category', 'proficiency', 'is_featured', 'order']
+    list_filter = ['category', 'is_featured']
+    search_fields = ['name', 'description']
+    list_editable = ['proficiency', 'is_featured', 'order']
+
+
+@admin.register(CareerTimeline)
+class CareerTimelineAdmin(admin.ModelAdmin):
+    list_display = ['job_title', 'company', 'job_type', 'start_date', 'end_date', 'is_current', 'order']
+    list_filter = ['job_type', 'is_current', 'start_date']
+    search_fields = ['job_title', 'company', 'location', 'technologies']
+    list_editable = ['is_current', 'order']
+
+
+@admin.register(FooterLink)
+class FooterLinkAdmin(admin.ModelAdmin):
+    list_display = ['title', 'url', 'category', 'is_external', 'is_active', 'order']
+    list_filter = ['category', 'is_external', 'is_active']
+    search_fields = ['title', 'url', 'icon_class']
+    list_editable = ['is_active', 'order']
 
 
 # Customize admin site headers
